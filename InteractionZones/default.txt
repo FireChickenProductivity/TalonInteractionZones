@@ -1,9 +1,9 @@
 #82acddff|(1711.50634765625, 881.0751342773438)
 BACKSPACE
-on hover warmup 5
+on hover 3 5
 backspace
 
 #81acddff|(1722.508056640625, 998.0823364257812)
 ENTER
-on hover warmup 1
+on hover 3 1
 enter
