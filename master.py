@@ -56,6 +56,7 @@ class Master:
         opt = self.get_optimal_file_name()
         s=os.path.join(HOME_DIRECTORY, opt)
         zone_id = 0
+        self.color_map = {}
         print("Matched current context to %s" % s)
         try:
             with open("%s.txt" % (s),"r") as f:
@@ -71,6 +72,7 @@ class Master:
                         z=parse_zone(ss)
                         if z != None:
                             self.zones[zone_id]=z
+                            z.add_to_map(self.color_map, zone_id)
                             zone_id += 1
                         else:
                             print("Failed to parse zone with config\n%s"%ss)
@@ -78,7 +80,6 @@ class Master:
             self.activeFile = opt
             
             print("Passed config parsing stage with %s"%self.activeFile)
-
             self.showZones = True
         except FileNotFoundError:
             print("Either configuration file txt or image png not found (%s)."%s)
@@ -186,20 +187,15 @@ class Master:
         x, y = ctrl.mouse_pos() 
         if not self.zonesRect.contains(x,y):
             return TRANSPARENT
-        color = self.bitmap.get_pixel(x,y)
-        colorID = str(color)
+        color = self.color_map.get((x,y), TRANSPARENT)
         
         
-        if colorID != "#00000000":  
-            if colorID not in self.zones:
-                print("There is no config matching %s!"%colorID) 
-                return None         
-            if colorID not in self.zones:
-                #self.zones[colorID]=Zone(self.configs[colorID])
-                print("Created zone for %s with\n%s!"%(colorID, self.configs[colorID]))
-                #should never be called
+        if color not in self.zones:
+            #print("There is no config matching %s!"%color) 
+            return None         
+              
                 
-        return colorID
+        return color
       
     def get_optimal_file_name(self):
         validFiles = list()

@@ -6,7 +6,7 @@ from .settings import *
 class Zone:
     def __init__(self,color,centre,name,ttype,action,warmup,repeatTime,modifiers, height=100, width=100) -> None:
         self.color=color
-        self.centre=centre
+        self.centre=(round(centre[0]), round(centre[1]))
         self.name=name
         self.triggerType=ttype
         self.action=action
@@ -15,7 +15,9 @@ class Zone:
         self.modifiers = modifiers
         self.height = height
         self.width = width
-        self.rectangle = Rect(self.centre[0] - self.width/2, self.centre[1] - self.height/2, self.width, self.height)
+        self.top = self.centre[1] - self.height//2
+        self.left = self.centre[0] - self.width//2
+        self.rectangle = Rect(self.left, self.top, self.width, self.height)
 
         self.modifierStartAwake = "start awake" in modifiers
         # at present the below modifier has no effect, for now all zones block input, makes it easier to use zoom mouse
@@ -98,6 +100,12 @@ class Zone:
     def start_timers(self):
         self.startTimer = time.time()
         self.repeatTimer = 0
+    
+    def add_to_map(self, map, id):
+        for x in range(self.height):
+            for y in range(self.width):
+                position = (self.left + x, self.top + y)
+                map[position] = id
     
 class TriggerZone(Zone):
     def __init__(self, color, centre, name, ttype, action, warmup, repeatTime,modifiers:str,action2) -> None:
