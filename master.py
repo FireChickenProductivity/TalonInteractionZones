@@ -6,6 +6,9 @@ from .config_parser import parse_zone,is_line_newzone,is_line_endzone
 from .settings import *
 
 HOME_DIRECTORY = verify_home_dir()
+ZONE_SIZE = 200
+
+
 
 class Master:
     def __init__(self) -> None:
@@ -52,9 +55,9 @@ class Master:
         self.zones = dict()
         opt = self.get_optimal_file_name()
         s=os.path.join(HOME_DIRECTORY, opt)
+        zone_id = 0
         print("Matched current context to %s" % s)
         try:
-            self.img = Image.from_file("%s.png" % (s))
             with open("%s.txt" % (s),"r") as f:
                 lines = f.readlines()
                 lines.append(" ")
@@ -67,16 +70,14 @@ class Master:
                     else:
                         z=parse_zone(ss)
                         if z != None:
-                            self.zones[z.color]=z
+                            self.zones[zone_id]=z
+                            zone_id += 1
                         else:
                             print("Failed to parse zone with config\n%s"%ss)
             
             self.activeFile = opt
             
             print("Passed config parsing stage with %s"%self.activeFile)
-
-            self.bitmap = self.img.to_bitmap()
-            self.zonesRect = Rect(0,0,self.img.width,self.img.height)
 
             self.showZones = True
         except FileNotFoundError:
@@ -123,7 +124,7 @@ class Master:
             return
 
         paint.color = rgba2hex(255,255,255,ZONES_ALPHA)
-        canvas.draw_image(self.img, 0,0)
+        #canvas.draw_image(self.img, 0,0)
         
         for c in self.zones:
             self.zones[c].draw(canvas)

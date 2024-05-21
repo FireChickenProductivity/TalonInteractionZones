@@ -1,10 +1,10 @@
-from talon.skia import Paint
+from talon.skia import Paint, Rect
 import time
 from .helpers import rgba2hex,TriggerType
 from .settings import *
 
 class Zone:
-    def __init__(self,color,centre,name,ttype,action,warmup,repeatTime,modifiers) -> None:
+    def __init__(self,color,centre,name,ttype,action,warmup,repeatTime,modifiers, height=100, width=100) -> None:
         self.color=color
         self.centre=centre
         self.name=name
@@ -13,7 +13,10 @@ class Zone:
         self.warmup=warmup
         self.repeatTime=repeatTime
         self.modifiers = modifiers
-        
+        self.height = height
+        self.width = width
+        self.rectangle = Rect(self.centre[0] - self.width/2, self.centre[1] - self.height/2, self.width, self.height)
+
         self.modifierStartAwake = "start awake" in modifiers
         # at present the below modifier has no effect, for now all zones block input, makes it easier to use zoom mouse
         # 'allow input' might be a better modifier
@@ -70,8 +73,7 @@ class Zone:
         
         paint = canvas.paint
         paint.text_align = canvas.paint.TextAlign.LEFT
-        paint.textsize = 25
-        paint.color = self.textColor
+        paint.textsize = 10
         paint.style = Paint.Style.FILL
         text = self.name
         tr = paint.measure_text(text)[1]
@@ -79,6 +81,9 @@ class Zone:
         x=self.centre[0]
         y=self.centre[1]
         
+        paint.color = "000000"
+        canvas.draw_rect(self.rectangle)
+        paint.color = self.textColor
         canvas.draw_text(text,x,y-tr.y)
         pass
     
