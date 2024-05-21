@@ -4,7 +4,7 @@ from .helpers import rgba2hex,TriggerType
 from .settings import *
 
 class Zone:
-    def __init__(self,color,centre,name,ttype,action,warmup,repeatTime,modifiers, height=100, width=100) -> None:
+    def __init__(self,color,centre,name,ttype,action,warmup,repeatTime,modifiers, height=190, width=190) -> None:
         self.color=color
         self.centre=(round(centre[0]), round(centre[1]))
         self.name=name

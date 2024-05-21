@@ -258,8 +258,10 @@ def primative_interaction(action:str):
            actions.user.mouse_scroll_up(float(action[11:].replace('\n','')))
         elif action[:6]=="mimic:": # Not recommended for usage generally (can cause unexpected behaviour)
             actions.user.engine_mimic(action[7:].replace('\n',''))
-        else:
+        elif not (action.startswith(' ') or action.endswith(' ')):
             actions.key(action)
+        else:
+            raise ValueError("Action not recognized")
     except ValueError:
         actions.insert(action)
     except Exception as e:

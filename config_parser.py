@@ -5,7 +5,7 @@ def is_line_newzone(l:str) -> bool:
     return l[0]=='#'
 
 def is_line_endzone(l:str) -> bool:
-    return l[0].isspace()
+    return l.isspace()
 
 def parse_zone(data:str) -> Zone:
     
