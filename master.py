@@ -158,10 +158,10 @@ class Master:
              
         if self.showZones:        
             colorID = self.get_active_zone_id()
-            if colorID!=None:
-                self.activeID=colorID
+            #if colorID!=None:
+            self.activeID=colorID
             
-            if self.activeID != TRANSPARENT:
+            if self.activeID != TRANSPARENT and self.activeID is not None:
                 block = True
                 
             for zoneID in self.zones:
@@ -171,6 +171,7 @@ class Master:
         self.canvas.blocks_mouse = block
             
         pass
+
     def slow_update(self):
         if not self.showZones:
             return
