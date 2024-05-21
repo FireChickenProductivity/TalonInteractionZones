@@ -21,6 +21,9 @@ ZONE_TOGGLE_OVERRIDE_HEIGHT = 30
 # Adjust the transparency of the zones toggle switch (top centre of the screen) [0, 255], where 255 is full opaque and 0 is invisible.
 ZONE_TOGGLE_SWITCH_ALPHA = 128
 
+# Determines of the toggle zone is available
+TOGGLE_ZONE_ENABLED = False
+
 # If true, the current window name will be displayed right below the toggle switch for the zones (small text on top of screen)
 # Useful if you want to use the AutoZone change feature or are wondering what the name of a window is to talon.
 SHOW_WINDOW_NAME = False

@@ -112,7 +112,7 @@ class Master:
             paint.color = rgba2hex(64,128,64,ZONE_TOGGLE_SWITCH_ALPHA)
         else:
             paint.color = rgba2hex(128,128,128,ZONE_TOGGLE_SWITCH_ALPHA)
-        canvas.draw_rect(self.toggleRect)
+        if TOGGLE_ZONE_ENABLED: canvas.draw_rect(self.toggleRect)
         
         if SHOW_WINDOW_NAME:
             paint.color = rgba2hex(255,255,255,200)
@@ -134,11 +134,8 @@ class Master:
     def on_mouse(self, event):
         x, y = ctrl.mouse_pos()  
             
-        if event.event=="mouseup" and self.toggleRect.contains(x,y):
-            if not self.showZones:
-                self.show()
-            else:
-                self.hide()
+        if TOGGLE_ZONE_ENABLED and event.event=="mouseup" and self.toggleRect.contains(x,y):
+            self.toggle_showing()
         
         if not self.showZones:
             return
@@ -147,13 +144,19 @@ class Master:
         if event.event=="mouseup" and id != TRANSPARENT:
             self.zones[id].click()
             pass
+
+    def toggle_showing(self):
+        if not self.showZones:
+            self.show()
+        else:
+            self.hide()
     
     def update(self):   
         x, y = ctrl.mouse_pos()   
         
         block = False   
         
-        if self.toggleRect.contains(x,y):
+        if TOGGLE_ZONE_ENABLED and self.toggleRect.contains(x,y):
             block = True
              
         if self.showZones:        
@@ -261,3 +264,7 @@ def primative_interaction(action:str):
         actions.insert(action)
     except Exception as e:
         print(str(e))
+
+def toggle_showing():
+    global master
+    master.toggle_showing()
