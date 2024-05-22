@@ -1,0 +1,184 @@
+#82acddff|(144, 101)
+POINT
+on hover 1 2
+.
+
+#81acddff|(344, 101)
+(
+on hover 1 2
+(
+
+#80acddff|(544, 101)
+SELF
+on hover 1 2
+self
+
+#7facddff|(744, 101)
+comma
+on hover 1 2
+, 
+
+#7eacddff|(944, 101)
+EQUALS
+on hover 1 2
+ = 
+
+#7dacddff|(1144, 101)
+enter
+on hover 1 2
+enter
+
+#7cacddff|(1344, 101)
+left
+on hover 1 1
+left
+
+#7bacddff|(1544, 101)
+up
+on hover 1 1
+up
+
+#7aacddff|(1744, 101)
+right
+on hover 1 1
+right
+
+#79acddff|(1544, 301)
+down
+on hover 1 1
+down
+
+#78acddff|(144, 301)
+SQUARE
+on hover 1 2
+[
+
+#77acddff|(344, 301)
+BRACE
+on hover 1 2
+{
+
+#76acddff|(544, 301)
+PLUS
+on hover 1 2
+ + 
+
+#75acddff|(744, 301)
+MINUS
+on hover 1 2
+ - 
+
+#74acddff|(944, 301)
+TIMES
+on hover 1 2
+ * 
+
+#73acddff|(1144, 301)
+DIVIDE
+on hover 1 2
+ / 
+
+#72acddff|(1344, 301)
+MODULO
+on hover 1 2
+ % 
+
+#71acddff|(1744, 301)
+dash
+on hover 1 2
+-
+
+#70acddff|(144, 501)
+NOT
+on hover 1 2
+not 
+
+#6facddff|(344, 501)
+AND
+on hover 1 2
+ and 
+
+#6eacddff|(544, 501)
+OR
+on hover 1 2
+ or 
+
+#6dacddff|(744, 501)
+COLIN
+on hover 1 2
+:
+
+#6cacddff|(944, 501)
+define
+on hover 1 2
+def 
+
+#6bacddff|(1144, 501)
+IF
+on hover 1 2
+if 
+
+#6aacddff|(1344, 501)
+ELSE
+on hover 1 2
+else
+
+#69acddff|(1544, 501)
+ELIF
+on hover 1 2
+elif 
+
+#68acddff|(1744, 501)
+WHILE
+on hover 1 2
+while 
+
+#67acddff|(144, 701)
+FOR
+on hover 1 2
+for 
+
+#66acddff|(344, 701)
+IN
+on hover 1 2
+ in 
+
+#65acddff|(544, 701)
+RANGE
+on hover 1 2
+range(
+
+#64acddff|(744, 701)
+QUOTE
+on hover 1 2
+'
+
+#63acddff|(944, 701)
+DUBQUOTE
+on hover 1 2
+"
+
+#62acddff|(1144, 701)
+CLASS
+on hover 1 2
+class 
+
+#61acddff|(1344, 701)
+RETURN
+on hover 1 2
+return 
+
+#60acddff|(1544, 701)
+TAB
+on hover 1 2
+tab
+
+#5facddff|(1744, 701)
+SHIFT_TAB
+on hover 1 2
+shift-tab
+
+#5eacddff|(144, 901)
+default
+on hover 1 2
+swap: default
