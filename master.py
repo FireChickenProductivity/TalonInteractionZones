@@ -204,7 +204,7 @@ class Master:
     def get_optimal_file_name(self):
         validFiles = list()
         for file in os.listdir(HOME_DIRECTORY):
-            if file.endswith(".png"):
+            if file.endswith(".txt"):
                 validFiles.append(file[:len(file)-4])
         
         if self.overrideFileName != None:
