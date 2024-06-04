@@ -2,3 +2,8 @@
 python
 on hover 1 1
 swap: python
+
+#7aacddff|(144, 101)
+spelling
+on hover 1 1
+swap: letters

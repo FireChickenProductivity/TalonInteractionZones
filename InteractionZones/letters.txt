@@ -1,0 +1,139 @@
+#82acddff|(144, 101)
+A
+on hover 1 2
+a
+
+#82acddff|(344, 101)
+B
+on hover 1 2
+b
+
+#82acddff|(544, 101)
+C
+on hover 1 2
+c
+
+#82acddff|(744, 101)
+D
+on hover 1 2
+d
+
+#82acddff|(944, 101)
+E
+on hover 1 2
+e
+
+#82acddff|(1144, 101)
+F
+on hover 1 2
+f
+
+#82acddff|(1344, 101)
+G
+on hover 1 2
+g
+
+#82acddff|(1544, 101)
+H
+on hover 1 2
+h
+
+#82acddff|(1744, 101)
+I
+on hover 1 2
+i
+
+#82acddff|(144, 301)
+J
+on hover 1 2
+j
+
+#82acddff|(344, 301)
+K
+on hover 1 2
+k
+
+#82acddff|(544, 301)
+L
+on hover 1 2
+l
+
+#82acddff|(744, 301)
+M
+on hover 1 2
+m
+
+#82acddff|(944, 301)
+N
+on hover 1 2
+n
+
+#82acddff|(1144, 301)
+O
+on hover 1 2
+o
+
+#82acddff|(1344, 301)
+P
+on hover 1 2
+p
+
+#82acddff|(1544, 301)
+Q
+on hover 1 2
+q
+
+#82acddff|(1744, 301)
+R
+on hover 1 2
+r
+
+#82acddff|(144, 501)
+S
+on hover 1 2
+s
+
+#82acddff|(344, 501)
+T
+on hover 1 2
+t
+
+#82acddff|(544, 501)
+U
+on hover 1 2
+u
+
+#82acddff|(744, 501)
+V
+on hover 1 2
+v
+
+#82acddff|(944, 501)
+W
+on hover 1 2
+w
+
+#82acddff|(1144, 501)
+X
+on hover 1 2
+x
+
+#82acddff|(1344, 501)
+Y
+on hover 1 2
+y
+
+#82acddff|(1544, 501)
+Z
+on hover 1 2
+z
+
+#82acddff|(1744, 501)
+UNDERSCORE
+on hover 1 2
+_
+
+#5eacddff|(144, 901)
+default
+on hover 1 2
+swap: default
