@@ -250,6 +250,11 @@ def primative_interaction(action:str):
             if (master==None):
                 print("Null master, please restart talon or report a bug if this persists.")
             master.set_zone_override(action[6:].replace('\n',''))
+        elif action == 'language': 
+            if (master==None):
+                print("Null master, please restart talon or report a bug if this persists.")
+            zone_override = actions.code.language()
+            master.set_zone_override(zone_override.replace('\n',''))
         elif action[:6]=="start:":
             os.startfile(action[7:].replace('\n',''))
         elif action[:12]=="scroll down:":
