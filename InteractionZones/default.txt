@@ -7,3 +7,13 @@ language
 spelling
 on hover 1 1
 swap: letters
+
+#7aacddff|(944, 101)
+page up
+on hover 1 1
+pageup
+
+#7aacddff|(944, 1000)
+page down
+on hover 1 1
+pagedown
