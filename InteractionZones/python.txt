@@ -169,9 +169,9 @@ on hover 1 2
 return 
 
 #60acddff|(1544, 701)
-TAB
+UNDO
 on hover 1 2
-tab
+ctrl-z
 
 #5facddff|(1744, 701)
 SHIFT_TAB

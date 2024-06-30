@@ -133,6 +133,17 @@ UNDERSCORE
 on hover 1 2
 _
 
+#82acddff|(144, 701)
+DASH
+on hover 1 2
+-
+
+#82acddff|(344, 701)
+SPACE
+on hover 1 2
+space
+
+
 #5eacddff|(144, 901)
 default
 on hover 1 2
