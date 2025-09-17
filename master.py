@@ -71,6 +71,18 @@ class Master:
             self.showZones = True
         if name == SNIPPET_ZONE_NAME:
             print('got this far')
+            snippet_names = actions.user.get_snippet_names()
+            self.color_map = {}
+            relevant_snippet_names = []
+            for snippet_name in snippet_names:
+                # make an appropriate zone?
+                try:
+                    snippet = actions.user.get_snippet(snippet_name)
+                    if snippet:
+                        relevant_snippet_names.append(snippet_name)
+                except Exception:
+                    pass
+            # I need to figure out what size to make the zones based on sin size and the number of snippets
 
     def show_file(self):
         print("show_file")
