@@ -9,6 +9,9 @@ HOME_DIRECTORY = verify_home_dir()
 ZONE_SIZE = 200
 
 SNIPPET_ACTION_PREFIX = "snippet "
+SPECIAL_SWAP_NAME_PREFIX = ":"
+SNIPPET_ZONE_NAME = "SNIPPET"
+SPECIAL_ZONE_NAMES = set([SNIPPET_ZONE_NAME])
 
 class Master:
     def __init__(self) -> None:
@@ -34,12 +37,14 @@ class Master:
             self.toggleRect=(Rect(self.screen.width/2 - w/2,10,w,h))
         
         self.lastWindowTitle = ""
-        self.activeFile = ""
-        self.overrideFileName=None
+        self.activeZoneSet = ""
+        self.overrideZoneSet=None
+        self.updateTriggered=False
         pass
 
-    def set_zone_override(self,file):
-        self.overrideFileName=file
+    def set_zone_override(self,zoneSet):
+        self.overrideZoneSet=zoneSet
+        self.updateTriggered = True
 
     def enable(self,showZones) -> None:  
         print("Enabling interaction zones")    
@@ -49,12 +54,28 @@ class Master:
         self.canvas.register("mouse", self.on_mouse)
         if showZones:
             self.show()      
+            
     def show(self):
         self.showZones = False
-        self.activeFile=""
+        self.activeZoneSet=""
         self.zones = dict()
-        opt = self.get_optimal_file_name()
-        s=os.path.join(HOME_DIRECTORY, opt)
+        if is_special_zone(self.overrideZoneSet):
+            self.show_special_zone_set()
+        else:
+            self.show_file()
+
+    def show_special_zone_set(self):
+        name = compute_special_zone_name(self.overrideZoneSet)
+        if name in SPECIAL_ZONE_NAMES:
+            self.activeZoneSet = name
+            self.showZones = True
+        if name == SNIPPET_ZONE_NAME:
+            print('got this far')
+
+    def show_file(self):
+        print("show_file")
+        optimal_name = self.get_optimal_file_name()
+        s=os.path.join(HOME_DIRECTORY, optimal_name)
         zone_id = 0
         self.color_map = {}
         print("Matched current context to %s" % s)
@@ -77,9 +98,9 @@ class Master:
                         else:
                             print("Failed to parse zone with config\n%s"%ss)
             
-            self.activeFile = opt
+            self.activeZoneSet = optimal_name
             
-            print("Passed config parsing stage with %s"%self.activeFile)
+            print("Passed config parsing stage with %s"%self.activeZoneSet)
             self.showZones = True
         except FileNotFoundError:
             print("Either configuration file txt or image png not found (%s)."%s)
@@ -175,13 +196,18 @@ class Master:
             
         pass
 
+    def should_update(self):
+        return self.updateTriggered or (not is_special_zone(self.overrideZoneSet) and (self.activeZoneSet != self.get_optimal_file_name()))
+
     def slow_update(self):
         if not self.showZones:
             return
         t = self.get_active_window_title()
-        if self.activeFile != self.get_optimal_file_name():
+        if self.should_update():
             self.hide()
             self.show()
+            self.updateTriggered = False
+
         if t != self.lastWindowTitle:
            self.set_zone_override(None)
         self.lastWindowTitle = t
@@ -207,12 +233,12 @@ class Master:
             if file.endswith(".txt"):
                 validFiles.append(file[:len(file)-4])
         
-        if self.overrideFileName != None:
-            if self.overrideFileName not in validFiles:
-                print("Failed to find '%s', keeping default."%self.overrideFileName)
-                self.overrideFileName=None
+        if self.overrideZoneSet != None:
+            if self.overrideZoneSet not in validFiles:
+                print("Failed to find '%s', keeping default."%self.overrideZoneSet)
+                self.overrideZoneSet=None
                 return self.get_optimal_file_name()
-            return self.overrideFileName
+            return self.overrideZoneSet
                 
         if not EXPERIMENTAL_AUTO_ZONE_CHANGE:
             return DEFAULT_FILE_NAME
@@ -249,7 +275,7 @@ def primative_interaction(action:str):
         elif action[:5]=="swap:":
             if (master==None):
                 print("Null master, please restart talon or report a bug if this persists.")
-            master.set_zone_override(action[6:].replace('\n',''))
+            master.set_zone_override(action[6:].strip())
         elif action == 'language': 
             if (master==None):
                 print("Null master, please restart talon or report a bug if this persists.")
@@ -281,3 +307,15 @@ def primative_interaction(action:str):
 def toggle_showing():
     global master
     master.toggle_showing()
+
+def is_special_zone(override_name) -> bool:
+    if override_name is None:
+        return False
+    if not override_name.startswith(SPECIAL_SWAP_NAME_PREFIX):
+        return False
+    name = compute_special_zone_name(override_name)
+    return name in SPECIAL_ZONE_NAMES
+
+def compute_special_zone_name(override_name: str) -> str:
+    return override_name[len(SPECIAL_SWAP_NAME_PREFIX):]
+    
