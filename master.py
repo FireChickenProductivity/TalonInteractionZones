@@ -4,6 +4,7 @@ import os
 from .helpers import rgba2hex, verify_home_dir, TRANSPARENT
 from .config_parser import parse_zone,is_line_newzone,is_line_endzone
 from .settings import *
+from .zones import SimpleZone
 
 HOME_DIRECTORY = verify_home_dir()
 ZONE_SIZE = 200
@@ -68,7 +69,6 @@ class Master:
         name = compute_special_zone_name(self.overrideZoneSet)
         if name in SPECIAL_ZONE_NAMES:
             self.activeZoneSet = name
-            self.showZones = True
         if name == SNIPPET_ZONE_NAME:
             print('got this far')
             snippet_names = actions.user.get_snippet_names()
@@ -83,6 +83,16 @@ class Master:
                 except Exception:
                     pass
             # I need to figure out what size to make the zones based on sin size and the number of snippets
+            # class SimpleZone(Zone):
+            #     def __init__(self, color, centre, name, ttype, action, warmup, repeatTime,modifiers:str) -> None:
+            id = 0
+            
+            for n in relevant_snippet_names:
+                id += 1
+                zone = SimpleZone(color="#7aacddff", name=n, ttype="on hover", action="snippet " + n, warmup=1, repeatTime=1, modifiers="", centre=(100, 200*id))
+                zone.add_to_map(self.color_map, id)
+                self.zones[id] = zone
+            self.showZones = True
 
     def show_file(self):
         print("show_file")
