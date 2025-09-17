@@ -8,7 +8,7 @@ from .settings import *
 HOME_DIRECTORY = verify_home_dir()
 ZONE_SIZE = 200
 
-
+SNIPPET_ACTION_PREFIX = "snippet "
 
 class Master:
     def __init__(self) -> None:
@@ -263,6 +263,12 @@ def primative_interaction(action:str):
            actions.user.mouse_scroll_up(float(action[11:].replace('\n','')))
         elif action[:6]=="mimic:": # Not recommended for usage generally (can cause unexpected behaviour)
             actions.user.engine_mimic(action[7:].replace('\n',''))
+        elif action.startswith(SNIPPET_ACTION_PREFIX):
+            snippet_name = action[len(SNIPPET_ACTION_PREFIX):]
+            if len(snippet_name) == 0:
+                print("Snippet interaction zone action is missing name!")
+            else:
+                actions.user.insert_snippet_by_name(snippet_name)
         elif not (action.startswith(' ') or action.endswith(' ')):
             actions.key(action)
         else:
