@@ -2,7 +2,7 @@ from talon import ui, canvas, cron, ctrl, actions
 from talon.skia import Rect, Image
 import os
 import math
-from .helpers import rgba2hex, verify_home_dir, TRANSPARENT
+from .helpers import rgba2hex, verify_home_dir, TRANSPARENT, TriggerType
 from .config_parser import parse_zone,is_line_newzone,is_line_endzone
 from .settings import *
 from .zones import SimpleZone
@@ -71,7 +71,6 @@ class Master:
         if name in SPECIAL_ZONE_NAMES:
             self.activeZoneSet = name
         if name == SNIPPET_ZONE_NAME:
-            print('got this far')
             snippet_names = actions.user.get_snippet_names()
             self.color_map = {}
             relevant_snippet_names = []
@@ -99,14 +98,13 @@ class Master:
             for n in relevant_snippet_names:
                 x = left + ((id % number_per_row_and_column) + 1)*zone_width - 0.5*zone_width
                 y = top + ((id//number_per_row_and_column) + 1)*zone_height - 0.5*zone_height
-                zone = SimpleZone(color="#7aacddff", name=n, ttype="on hover", action="snippet " + n, warmup=1, repeatTime=1, modifiers="", centre=(x, y), dimensions=zone_dimensions)
-                zone.add_to_map(self.color_map, id)
+                zone = SimpleZone(color="#7aacddff", name=n, ttype=TriggerType.HOVER, action="snippet " + n, warmup=1, repeatTime=1, modifiers="", centre=(x, y), dimensions=zone_dimensions)
                 self.zones[id] = zone
+                zone.add_to_map(self.color_map, id)
                 id += 1
             self.showZones = True
 
     def show_file(self):
-        print("show_file")
         optimal_name = self.get_optimal_file_name()
         s=os.path.join(HOME_DIRECTORY, optimal_name)
         zone_id = 0
