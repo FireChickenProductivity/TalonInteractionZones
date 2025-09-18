@@ -82,6 +82,7 @@ class Master:
                         relevant_snippet_names.append(snippet_name)
                 except Exception:
                     pass
+            relevant_snippet_names = sorted(relevant_snippet_names)
             # I need to figure out what size to make the zones based on sin size and the number of snippets
             # class SimpleZone(Zone):
             #     def __init__(self, color, centre, name, ttype, action, warmup, repeatTime,modifiers:str) -> None:
@@ -93,7 +94,7 @@ class Master:
             number_per_row_and_column = math.ceil(math.sqrt(len(relevant_snippet_names)))
             zone_width = math.floor(width/number_per_row_and_column)
             zone_height = math.floor(height/number_per_row_and_column)
-            zone_dimensions = (zone_width, zone_height)
+            zone_dimensions = (math.floor(0.9*zone_height), math.floor(0.9*zone_width))
             
             for n in relevant_snippet_names:
                 x = left + ((id % number_per_row_and_column) + 1)*zone_width - 0.5*zone_width

@@ -102,8 +102,8 @@ class Zone:
         self.repeatTimer = 0
     
     def add_to_map(self, map, id):
-        for x in range(self.height):
-            for y in range(self.width):
+        for x in range(self.width):
+            for y in range(self.height):
                 position = (self.left + x, self.top + y)
                 map[position] = id
     
