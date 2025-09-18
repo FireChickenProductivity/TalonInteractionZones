@@ -175,8 +175,11 @@ class TriggerZone(Zone):
             self.interact()
 
 class SimpleZone(Zone):
-    def __init__(self, color, centre, name, ttype, action, warmup, repeatTime,modifiers:str) -> None:
-        super().__init__(color, centre, name, ttype, action, warmup, repeatTime,modifiers)
+    def __init__(self, color, centre, name, ttype, action, warmup, repeatTime,modifiers:str, dimensions: tuple[int, int]=None) -> None:
+        if dimensions:
+            super().__init__(color, centre, name, ttype, action, warmup, repeatTime,modifiers, dimensions[0], dimensions[1])
+        else:
+            super().__init__(color, centre, name, ttype, action, warmup, repeatTime,modifiers)
         
     def interact(self):
         super().interact()

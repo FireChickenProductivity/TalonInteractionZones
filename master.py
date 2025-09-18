@@ -1,6 +1,7 @@
 from talon import ui, canvas, cron, ctrl, actions
 from talon.skia import Rect, Image
 import os
+import math
 from .helpers import rgba2hex, verify_home_dir, TRANSPARENT
 from .config_parser import parse_zone,is_line_newzone,is_line_endzone
 from .settings import *
@@ -86,12 +87,22 @@ class Master:
             # class SimpleZone(Zone):
             #     def __init__(self, color, centre, name, ttype, action, warmup, repeatTime,modifiers:str) -> None:
             id = 0
+            left = self.zonesRect.left
+            top = self.zonesRect.top
+            height = self.zonesRect.height
+            width = self.zonesRect.width
+            number_per_row_and_column = math.ceil(math.sqrt(len(relevant_snippet_names)))
+            zone_width = math.floor(width/number_per_row_and_column)
+            zone_height = math.floor(height/number_per_row_and_column)
+            zone_dimensions = (zone_width, zone_height)
             
             for n in relevant_snippet_names:
-                id += 1
-                zone = SimpleZone(color="#7aacddff", name=n, ttype="on hover", action="snippet " + n, warmup=1, repeatTime=1, modifiers="", centre=(100, 200*id))
+                x = left + ((id % number_per_row_and_column) + 1)*zone_width - 0.5*zone_width
+                y = top + ((id//number_per_row_and_column) + 1)*zone_height - 0.5*zone_height
+                zone = SimpleZone(color="#7aacddff", name=n, ttype="on hover", action="snippet " + n, warmup=1, repeatTime=1, modifiers="", centre=(x, y), dimensions=zone_dimensions)
                 zone.add_to_map(self.color_map, id)
                 self.zones[id] = zone
+                id += 1
             self.showZones = True
 
     def show_file(self):
@@ -317,6 +328,7 @@ def primative_interaction(action:str):
                 print("Snippet interaction zone action is missing name!")
             else:
                 actions.user.insert_snippet_by_name(snippet_name)
+                master.set_zone_override(DEFAULT_FILE_NAME)
         elif not (action.startswith(' ') or action.endswith(' ')):
             actions.key(action)
         else:
