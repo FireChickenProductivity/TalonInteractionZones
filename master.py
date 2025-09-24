@@ -143,9 +143,7 @@ class Master:
                 self.set_zone_override(DEFAULT_FILE_NAME)
             def create_lambda(operator_name):
                 return lambda: insert_operator(operator_name)
-            corresponding_actions = []
-            for operator_name in operator_names:
-                corresponding_actions.append(create_lambda(operator_name))
+            corresponding_actions = [create_lambda(operator_name) for operator_name in operator_names]
             self.show_zone_for_list(operator_names, corresponding_actions)
 
     def show_zone_for_list(self, names, corresponding_actions):
