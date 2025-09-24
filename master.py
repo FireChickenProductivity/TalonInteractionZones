@@ -2,6 +2,7 @@ from talon import ui, canvas, cron, ctrl, actions
 from talon.skia import Rect, Image
 import os
 import math
+from typing import Union, Callable
 from .helpers import rgba2hex, verify_home_dir, TRANSPARENT, TriggerType
 from .config_parser import parse_zone,is_line_newzone,is_line_endzone
 from .settings import *
@@ -134,10 +135,23 @@ class Master:
             "POINTER_INDIRECTION",
             "POINTER_ADDRESS_OF",
             "POINTER_STRUCTURE_DEREFERENCE",]
-            corresponding_actions = [OPERATOR_ACTION_PREFIX + name for name in operator_names]
+            def insert_operator(operator_name):
+                try:
+                    actions.user.code_operator(operator_name)
+                except Exception as ex:
+                    print('operator_name', operator_name)
+                self.set_zone_override(DEFAULT_FILE_NAME)
+            def create_lambda(operator_name):
+                return lambda: insert_operator(operator_name)
+            corresponding_actions = []
+            for operator_name in operator_names:
+                corresponding_actions.append(create_lambda(operator_name))
             self.show_zone_for_list(operator_names, corresponding_actions)
 
     def show_zone_for_list(self, names, corresponding_actions):
+        if len(names) != len(corresponding_actions):
+            print("The number of names in the list did not match the number of actions!")
+            return 
         id = 0
         left = self.zonesRect.left
         top = self.zonesRect.top
@@ -353,8 +367,12 @@ def setup():
     master = Master()
     master.enable(DEFAULT_SHOW)
     
-def primative_interaction(action:str):
+def primative_interaction(action:Union[Callable, str]):
     """All interactions ever fired are fired here."""
+    if isinstance(action, Callable):
+        action()
+        return 
+    
     global master
     try:
         if action[:5]=="bind:":
