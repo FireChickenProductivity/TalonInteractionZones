@@ -80,7 +80,7 @@ class Zone:
         text = self.name
         tr = paint.measure_text(text)[1]
         
-        x=self.centre[0]
+        x=self.left
         y=self.centre[1]
         
         paint.color = "000000"

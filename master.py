@@ -103,6 +103,11 @@ class Master:
                 self.zones[id] = zone
                 zone.add_to_map(self.color_map, id)
                 id += 1
+            x = left + ((id % number_per_row_and_column) + 1)*zone_width - 0.5*zone_width
+            y = top + ((id//number_per_row_and_column) + 1)*zone_height - 0.5*zone_height
+            return_to_default_zone = SimpleZone(color="#7aacddff", name="swap default", ttype=TriggerType.HOVER, action="swap: default", warmup=1, repeatTime=1, modifiers="", centre=(x, y), dimensions=zone_dimensions)
+            self.zones[id] = return_to_default_zone
+            return_to_default_zone.add_to_map(self.color_map, id)
             self.showZones = True
 
     def show_file(self):
