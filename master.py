@@ -95,16 +95,18 @@ class Master:
             zone_width = math.floor(width/number_per_row_and_column)
             zone_height = math.floor(height/number_per_row_and_column)
             zone_dimensions = (math.floor(0.8*zone_height), math.floor(0.8*zone_width))
-            
-            for n in relevant_snippet_names:
+            def compute_dimensions(id):
                 x = left + ((id % number_per_row_and_column) + 1)*zone_width - 0.5*zone_width
                 y = top + ((id//number_per_row_and_column) + 1)*zone_height - 0.5*zone_height
+                return x, y
+            
+            for n in relevant_snippet_names:
+                x, y = compute_dimensions(id)
                 zone = SimpleZone(color="#7aacddff", name=n, ttype=TriggerType.HOVER, action="snippet " + n, warmup=1, repeatTime=1, modifiers="", centre=(x, y), dimensions=zone_dimensions)
                 self.zones[id] = zone
                 zone.add_to_map(self.color_map, id)
                 id += 1
-            x = left + ((id % number_per_row_and_column) + 1)*zone_width - 0.5*zone_width
-            y = top + ((id//number_per_row_and_column) + 1)*zone_height - 0.5*zone_height
+            x, y = compute_dimensions(id)
             return_to_default_zone = SimpleZone(color="#7aacddff", name="swap default", ttype=TriggerType.HOVER, action="swap: default", warmup=1, repeatTime=1, modifiers="", centre=(x, y), dimensions=zone_dimensions)
             self.zones[id] = return_to_default_zone
             return_to_default_zone.add_to_map(self.color_map, id)
