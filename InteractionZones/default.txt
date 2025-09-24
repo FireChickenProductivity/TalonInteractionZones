@@ -13,6 +13,11 @@ snippets
 on hover 1 1
 swap: :SNIPPET
 
+#7aacddff|(1244, 101)
+operators
+on hover 1 1
+swap: :OPERATOR
+
 #7aacddff|(944, 1000)
 page down
 on hover 1 1

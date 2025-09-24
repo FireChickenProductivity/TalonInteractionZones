@@ -10,10 +10,12 @@ from .zones import SimpleZone
 HOME_DIRECTORY = verify_home_dir()
 ZONE_SIZE = 200
 
-SNIPPET_ACTION_PREFIX = "snippet "
+SNIPPET_ACTION_PREFIX = "snippet: "
+OPERATOR_ACTION_PREFIX = "operator: "
 SPECIAL_SWAP_NAME_PREFIX = ":"
 SNIPPET_ZONE_NAME = "SNIPPET"
-SPECIAL_ZONE_NAMES = set([SNIPPET_ZONE_NAME])
+OPERATOR_ZONE_NAME = "OPERATOR"
+SPECIAL_ZONE_NAMES = set([SNIPPET_ZONE_NAME, OPERATOR_ZONE_NAME])
 
 class Master:
     def __init__(self) -> None:
@@ -83,8 +85,58 @@ class Master:
                 except Exception:
                     pass
             relevant_snippet_names = sorted(relevant_snippet_names)
-            snippet_actions = ["snippet " + name for name in relevant_snippet_names]
+            snippet_actions = ["snippet: " + name for name in relevant_snippet_names]
             self.show_zone_for_list(relevant_snippet_names, snippet_actions)
+        elif name == OPERATOR_ZONE_NAME:
+            operator_names = ["SUBSCRIPT",
+            "ASSIGNMENT",
+            "ASSIGNMENT_OR",
+            "ASSIGNMENT_SUBTRACTION",
+            "ASSIGNMENT_ADDITION",
+            "ASSIGNMENT_MULTIPLICATION",
+            "ASSIGNMENT_DIVISION",
+            "ASSIGNMENT_MODULO",
+            "ASSIGNMENT_INCREMENT",
+            "ASSIGNMENT_BITWISE_AND",
+            "ASSIGNMENT_BITWISE_OR",
+            "ASSIGNMENT_BITWISE_EXCLUSIVE_OR",
+            "ASSIGNMENT_BITWISE_LEFT_SHIFT",
+            "ASSIGNMENT_BITWISE_RIGHT_SHIFT",
+            "BITWISE_AND",
+            "BITWISE_OR",
+            "BITWISE_NOT",
+            "BITWISE_EXCLUSIVE_OR",
+            "BITWISE_LEFT_SHIFT",
+            "BITWISE_RIGHT_SHIFT",
+            "LAMBDA",
+            "MATH_SUBTRACT",
+            "MATH_ADD",
+            "MATH_MULTIPLY",
+            "MATH_DIVIDE",
+            "MATH_INTEGER_DIVIDE",
+            "MATH_MODULO",
+            "MATH_EXPONENT",
+            "MATH_EQUAL",
+            "MATH_NOT_EQUAL",
+            "MATH_WEAK_EQUAL",
+            "MATH_WEAK_NOT_EQUAL",
+            "MATH_WEAK_AND",
+            "MATH_WEAK_OR",
+            "MATH_WEAK_NOT",
+            "MATH_GREATER_THAN",
+            "MATH_GREATER_THAN_OR_EQUAL",
+            "MATH_LESS_THAN",
+            "MATH_LESS_THAN_OR_EQUAL",
+            "MATH_AND",
+            "MATH_OR",
+            "MATH_NOT",
+            "MATH_IN",
+            "MATH_NOT_IN",
+            "POINTER_INDIRECTION",
+            "POINTER_ADDRESS_OF",
+            "POINTER_STRUCTURE_DEREFERENCE",]
+            corresponding_actions = [OPERATOR_ACTION_PREFIX + name for name in operator_names]
+            self.show_zone_for_list(operator_names, corresponding_actions)
 
     def show_zone_for_list(self, names, corresponding_actions):
         id = 0
@@ -336,6 +388,10 @@ def primative_interaction(action:str):
             else:
                 actions.user.insert_snippet_by_name(snippet_name)
                 master.set_zone_override(DEFAULT_FILE_NAME)
+        elif action.startswith(OPERATOR_ACTION_PREFIX):
+            operator_name = action[len(OPERATOR_ACTION_PREFIX):]
+            actions.user.code_operator(operator_name)
+            master.set_zone_override(DEFAULT_FILE_NAME)
         elif not (action.startswith(' ') or action.endswith(' ')):
             actions.key(action)
         else:
