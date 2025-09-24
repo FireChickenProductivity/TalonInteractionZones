@@ -182,7 +182,6 @@ class SimpleZone(Zone):
             super().__init__(color, centre, name, ttype, action, warmup, repeatTime,modifiers)
         
     def interact(self):
-        print("interact")
         super().interact()
     
         self.fire_interaction(self.action)
@@ -199,10 +198,8 @@ class SimpleZone(Zone):
                 self.clear_timers()
                         
     def on_hover_change(self,isHovering: bool):
-        print("on_hover_change", isHovering)
         super().on_hover_change(isHovering)
         if self.triggerType != TriggerType.HOVER:
-            print("returning from not hover")
             return
         
         if isHovering:

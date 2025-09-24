@@ -51,7 +51,6 @@ class Master:
         self.updateTriggered = True
 
     def enable(self,showZones) -> None:  
-        print("Enabling interaction zones")    
         self.canvas.register("draw", self.draw)        
         self.job = cron.interval('16ms', self.update)        
         self.job2 = cron.interval('100ms', self.slow_update)        
@@ -170,7 +169,6 @@ class Master:
         s=os.path.join(HOME_DIRECTORY, optimal_name)
         zone_id = 0
         self.color_map = {}
-        print("Matched current context to %s" % s)
         try:
             with open("%s.txt" % (s),"r") as f:
                 lines = f.readlines()
