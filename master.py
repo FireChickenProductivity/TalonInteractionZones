@@ -83,34 +83,35 @@ class Master:
                 except Exception:
                     pass
             relevant_snippet_names = sorted(relevant_snippet_names)
-            # I need to figure out what size to make the zones based on sin size and the number of snippets
-            # class SimpleZone(Zone):
-            #     def __init__(self, color, centre, name, ttype, action, warmup, repeatTime,modifiers:str) -> None:
-            id = 0
-            left = self.zonesRect.left
-            top = self.zonesRect.top
-            height = self.zonesRect.height
-            width = self.zonesRect.width
-            number_per_row_and_column = math.ceil(math.sqrt(len(relevant_snippet_names)))
-            zone_width = math.floor(width/number_per_row_and_column)
-            zone_height = math.floor(height/number_per_row_and_column)
-            zone_dimensions = (math.floor(0.8*zone_height), math.floor(0.8*zone_width))
-            def compute_dimensions(id):
-                x = left + ((id % number_per_row_and_column) + 1)*zone_width - 0.5*zone_width
-                y = top + ((id//number_per_row_and_column) + 1)*zone_height - 0.5*zone_height
-                return x, y
-            
-            for n in relevant_snippet_names:
-                x, y = compute_dimensions(id)
-                zone = SimpleZone(color="#7aacddff", name=n, ttype=TriggerType.HOVER, action="snippet " + n, warmup=1, repeatTime=1, modifiers="", centre=(x, y), dimensions=zone_dimensions)
-                self.zones[id] = zone
-                zone.add_to_map(self.color_map, id)
-                id += 1
+            snippet_actions = ["snippet " + name for name in relevant_snippet_names]
+            self.show_zone_for_list(relevant_snippet_names, snippet_actions)
+
+    def show_zone_for_list(self, names, corresponding_actions):
+        id = 0
+        left = self.zonesRect.left
+        top = self.zonesRect.top
+        height = self.zonesRect.height
+        width = self.zonesRect.width
+        number_per_row_and_column = math.ceil(math.sqrt(len(names)))
+        zone_width = math.floor(width/number_per_row_and_column)
+        zone_height = math.floor(height/number_per_row_and_column)
+        zone_dimensions = (math.floor(0.8*zone_height), math.floor(0.8*zone_width))
+        def compute_dimensions(id):
+            x = left + ((id % number_per_row_and_column) + 1)*zone_width - 0.5*zone_width
+            y = top + ((id//number_per_row_and_column) + 1)*zone_height - 0.5*zone_height
+            return x, y
+        
+        for n, action in zip(names, corresponding_actions):
             x, y = compute_dimensions(id)
-            return_to_default_zone = SimpleZone(color="#7aacddff", name="swap default", ttype=TriggerType.HOVER, action="swap: default", warmup=1, repeatTime=1, modifiers="", centre=(x, y), dimensions=zone_dimensions)
-            self.zones[id] = return_to_default_zone
-            return_to_default_zone.add_to_map(self.color_map, id)
-            self.showZones = True
+            zone = SimpleZone(color="#7aacddff", name=n, ttype=TriggerType.HOVER, action=action, warmup=1, repeatTime=1, modifiers="", centre=(x, y), dimensions=zone_dimensions)
+            self.zones[id] = zone
+            zone.add_to_map(self.color_map, id)
+            id += 1
+        x, y = compute_dimensions(id)
+        return_to_default_zone = SimpleZone(color="#7aacddff", name="swap default", ttype=TriggerType.HOVER, action="swap: default", warmup=1, repeatTime=1, modifiers="", centre=(x, y), dimensions=zone_dimensions)
+        self.zones[id] = return_to_default_zone
+        return_to_default_zone.add_to_map(self.color_map, id)
+        self.showZones = True
 
     def show_file(self):
         optimal_name = self.get_optimal_file_name()
