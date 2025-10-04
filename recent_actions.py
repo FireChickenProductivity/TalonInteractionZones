@@ -8,10 +8,11 @@ class ActionQueue:
 		self.queue = deque()
 	
 	def insert(self, entry):
-		if entry not in self.queue:
-			self.queue.appendleft(entry)
-			if len(self.queue) > self.size:
-				self.queue.pop()
+		if entry in self.queue:
+			self.queue.remove(entry)
+		self.queue.appendleft(entry)
+		if len(self.queue) > self.size:
+			self.queue.pop()
 
 	def get_items(self):
 		return [i for i in self.queue]
