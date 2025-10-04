@@ -158,7 +158,7 @@ class Master:
         number_per_row_and_column = math.ceil(math.sqrt(len(names)))
         zone_width = math.floor(width/number_per_row_and_column)
         zone_height = math.floor(height/number_per_row_and_column)
-        zone_dimensions = (math.floor(0.8*zone_height), math.floor(0.8*zone_width))
+        zone_dimensions = (math.floor(0.65*zone_height), math.floor(0.65*zone_width))
         def compute_dimensions(id):
             x = left + ((id % number_per_row_and_column) + 1)*zone_width - 0.5*zone_width
             y = top + ((id//number_per_row_and_column) + 1)*zone_height - 0.5*zone_height
