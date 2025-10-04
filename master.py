@@ -17,7 +17,8 @@ SPECIAL_SWAP_NAME_PREFIX = ":"
 SNIPPET_ZONE_NAME = "SNIPPET"
 OPERATOR_ZONE_NAME = "OPERATOR"
 RECENT_INSERTS_ZONE_NAME = "RECENT_INSERT"
-SPECIAL_ZONE_NAMES = set([SNIPPET_ZONE_NAME, OPERATOR_ZONE_NAME, RECENT_INSERTS_ZONE_NAME])
+RECENT_KEYSTROKES_ZONE_NAME = "RECENT_KEYSTROKE"
+SPECIAL_ZONE_NAMES = set([SNIPPET_ZONE_NAME, OPERATOR_ZONE_NAME, RECENT_INSERTS_ZONE_NAME, RECENT_KEYSTROKES_ZONE_NAME])
 
 class Master:
     def __init__(self) -> None:
@@ -86,8 +87,8 @@ class Master:
                 except Exception:
                     pass
             relevant_snippet_names = sorted(relevant_snippet_names)
-            snippet_actions = ["snippet: " + name for name in relevant_snippet_names]
-            self.show_zone_for_list(relevant_snippet_names, snippet_actions)
+            insert_actions = ["snippet: " + name for name in relevant_snippet_names]
+            self.show_zone_for_list(relevant_snippet_names, insert_actions)
         elif name == RECENT_INSERTS_ZONE_NAME:
             recent_inserts = actions.user.fire_chicken_interaction_zones_get_recent_inserts()
             def insert_text(text):
@@ -95,8 +96,17 @@ class Master:
                 actions.insert(text)
             def create_operator(text):
                 return lambda: insert_text(text)
-            snippet_actions = [create_operator(text) for text in recent_inserts]
-            self.show_zone_for_list(recent_inserts, snippet_actions)
+            insert_actions = [create_operator(text) for text in recent_inserts]
+            self.show_zone_for_list(recent_inserts, insert_actions)
+        elif name == RECENT_KEYSTROKES_ZONE_NAME:
+            recent_keystrokes = actions.user.fire_chicken_interaction_zones_get_recent_keystrokes()
+            def press_keystroke(keystroke):
+                self.set_zone_override(DEFAULT_FILE_NAME)
+                actions.key(keystroke)
+            def create_operator(keystroke):
+                return lambda: press_keystroke(keystroke)
+            key_stroke_actions = [create_operator(keystroke) for keystroke in recent_keystrokes]
+            self.show_zone_for_list(recent_keystrokes, key_stroke_actions)
         elif name == OPERATOR_ZONE_NAME:
             operator_names = ["SUBSCRIPT",
             "ASSIGNMENT",
