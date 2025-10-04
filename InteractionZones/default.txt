@@ -13,6 +13,11 @@ snippets
 on hover 1 1
 swap: :SNIPPET
 
+#7aacddff|(744, 101)
+insert
+on hover 1 1
+swap: :RECENT_INSERT
+
 #7aacddff|(1244, 101)
 operators
 on hover 1 1

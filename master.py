@@ -16,7 +16,8 @@ OPERATOR_ACTION_PREFIX = "operator: "
 SPECIAL_SWAP_NAME_PREFIX = ":"
 SNIPPET_ZONE_NAME = "SNIPPET"
 OPERATOR_ZONE_NAME = "OPERATOR"
-SPECIAL_ZONE_NAMES = set([SNIPPET_ZONE_NAME, OPERATOR_ZONE_NAME])
+RECENT_INSERTS_ZONE_NAME = "RECENT_INSERT"
+SPECIAL_ZONE_NAMES = set([SNIPPET_ZONE_NAME, OPERATOR_ZONE_NAME, RECENT_INSERTS_ZONE_NAME])
 
 class Master:
     def __init__(self) -> None:
@@ -87,6 +88,15 @@ class Master:
             relevant_snippet_names = sorted(relevant_snippet_names)
             snippet_actions = ["snippet: " + name for name in relevant_snippet_names]
             self.show_zone_for_list(relevant_snippet_names, snippet_actions)
+        elif name == RECENT_INSERTS_ZONE_NAME:
+            recent_inserts = actions.user.fire_chicken_interaction_zones_get_recent_inserts()
+            def insert_text(text):
+                self.set_zone_override(DEFAULT_FILE_NAME)
+                actions.insert(text)
+            def create_operator(text):
+                return lambda: insert_text(text)
+            snippet_actions = [create_operator(text) for text in recent_inserts]
+            self.show_zone_for_list(recent_inserts, snippet_actions)
         elif name == OPERATOR_ZONE_NAME:
             operator_names = ["SUBSCRIPT",
             "ASSIGNMENT",
