@@ -150,7 +150,7 @@ class Master:
         if len(names) != len(corresponding_actions):
             print("The number of names in the list did not match the number of actions!")
             return 
-        id = 0
+        zone_number = 0
         left = self.zonesRect.left
         top = self.zonesRect.top
         height = self.zonesRect.height
@@ -165,21 +165,18 @@ class Master:
             return x, y
         
         for n, action in zip(names, corresponding_actions):
-            x, y = compute_dimensions(id)
+            x, y = compute_dimensions(zone_number)
             zone = SimpleZone(color="#7aacddff", name=n, ttype=TriggerType.HOVER, action=action, warmup=1, repeatTime=1, modifiers="", centre=(x, y), dimensions=zone_dimensions)
-            self.zones[id] = zone
-            zone.add_to_map(self.color_map, id)
-            id += 1
-        x, y = compute_dimensions(id)
+            self.add_zone(zone)
+            zone_number += 1
+        x, y = compute_dimensions(zone_number)
         return_to_default_zone = SimpleZone(color="#7aacddff", name="swap default", ttype=TriggerType.HOVER, action="swap: default", warmup=1, repeatTime=1, modifiers="", centre=(x, y), dimensions=zone_dimensions)
-        self.zones[id] = return_to_default_zone
-        return_to_default_zone.add_to_map(self.color_map, id)
+        self.add_zone(return_to_default_zone)
         self.showZones = True
 
     def show_file(self):
         optimal_name = self.get_optimal_file_name()
         s=os.path.join(HOME_DIRECTORY, optimal_name)
-        zone_id = 0
         self.color_map = {}
         try:
             with open("%s.txt" % (s),"r") as f:
@@ -194,9 +191,7 @@ class Master:
                     else:
                         z=parse_zone(ss)
                         if z != None:
-                            self.zones[zone_id]=z
-                            z.add_to_map(self.color_map, zone_id)
-                            zone_id += 1
+                            self.add_zone(z)
                         else:
                             print("Failed to parse zone with config\n%s"%ss)
             
@@ -207,6 +202,11 @@ class Master:
         except FileNotFoundError:
             print("Either configuration file txt or image png not found (%s)."%s)
             return
+
+    def add_zone(self, zone):
+        zone_id = len(self.zones)
+        self.zones[zone_id]=zone
+        zone.add_to_map(self.color_map, zone_id)
             
     def disable(self) -> None:        
         self.canvas.unregister("draw", self.draw) 
