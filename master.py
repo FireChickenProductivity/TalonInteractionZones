@@ -7,6 +7,7 @@ from .helpers import rgba2hex, verify_home_dir, TRANSPARENT, TriggerType
 from .config_parser import parse_zone,is_line_newzone,is_line_endzone
 from .settings import *
 from .zones import SimpleZone
+from .keyboard import Keyboard, Key
 
 HOME_DIRECTORY = verify_home_dir()
 ZONE_SIZE = 200
@@ -18,7 +19,8 @@ SNIPPET_ZONE_NAME = "SNIPPET"
 OPERATOR_ZONE_NAME = "OPERATOR"
 RECENT_INSERTS_ZONE_NAME = "RECENT_INSERT"
 RECENT_KEYSTROKES_ZONE_NAME = "RECENT_KEYSTROKE"
-SPECIAL_ZONE_NAMES = set([SNIPPET_ZONE_NAME, OPERATOR_ZONE_NAME, RECENT_INSERTS_ZONE_NAME, RECENT_KEYSTROKES_ZONE_NAME])
+KEYBOARD_ZONE_NAME = "KEYBOARD"
+SPECIAL_ZONE_NAMES = set([SNIPPET_ZONE_NAME, OPERATOR_ZONE_NAME, RECENT_INSERTS_ZONE_NAME, RECENT_KEYSTROKES_ZONE_NAME, KEYBOARD_ZONE_NAME])
 
 class Master:
     def __init__(self) -> None:
@@ -47,7 +49,8 @@ class Master:
         self.activeZoneSet = ""
         self.overrideZoneSet=None
         self.updateTriggered=False
-        pass
+        self.keyboard: Keyboard = Keyboard()
+        self.keyboard.update_size(self.screen.width//2, self.screen.height//2)
 
     def set_zone_override(self,zoneSet):
         self.overrideZoneSet=zoneSet
@@ -165,6 +168,26 @@ class Master:
                 return lambda: insert_operator(operator_name)
             corresponding_actions = [create_lambda(operator_name) for operator_name in operator_names]
             self.show_zone_for_list(operator_names, corresponding_actions)
+        elif name == KEYBOARD_ZONE_NAME:
+            def create_key_operator(key: Key):
+                return lambda: self.keyboard.handle_keypress(key)
+                
+            self.color_map = {}
+            x = self.keyboard.x
+            y = self.keyboard.y
+            key_height = self.keyboard.compute_key_height()
+            for row_index in range(len(self.keyboard.rows)):
+                key_width = self.keyboard.compute_row_key_width(row_index)
+                for key in self.keyboard.rows[row_index]:
+                    key_text = f"{key.main_key} / {key.secondary_key}" if key.secondary_key else key.main_key
+                    center_x = x + key_width // 2
+                    center_y = y + key_height // 2
+                    zone = SimpleZone(color="#7aacddff", name=key_text, ttype=TriggerType.HOVER, action=create_key_operator(key), warmup=1, repeatTime=1, modifiers="", centre=(center_x, center_y), dimensions=(key_height, key_width))
+                    self.add_zone(zone)
+                    x += key_width
+                y += key_height
+                x = self.keyboard.x
+            self.showZones = True
 
     def show_zone_for_list(self, names, corresponding_actions):
         if len(names) != len(corresponding_actions):

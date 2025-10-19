@@ -4,9 +4,9 @@ on hover 1 1
 language
 
 #7aacddff|(144, 101)
-spelling
+keyboard
 on hover 1 1
-swap: letters
+swap: :KEYBOARD
 
 #7aacddff|(944, 101)
 snippets
