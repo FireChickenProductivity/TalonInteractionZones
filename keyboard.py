@@ -40,8 +40,8 @@ class Keyboard:
 			[Key("shift", is_modifier=True)] + [create_letter_key(c) for c in "zxcvbnm"] + [Key(",", "<"), Key(".", ">"), Key("/", "?"), Key("rshift", is_modifier=True)],
 			[Key("ctrl", is_modifier=True), Key("alt", is_modifier=True), Key("super", is_modifier=True), Key("space"), Key("rctrl", is_modifier=True), Key("ralt", is_modifier=True), Key("left"), Key("down"), Key("up"), Key("right")]
 		]
-		self.x: int = 0
-		self.y: int = 0
+		self.x: int = 20
+		self.y: int = 20
 		self._height: int = 0
 		self._width: int = 0
 

@@ -187,6 +187,10 @@ class Master:
                     x += key_width
                 y += key_height
                 x = self.keyboard.x
+            center_x = x + key_width // 2
+            center_y = y + key_height // 2
+            return_to_default_zone = SimpleZone(color="#7aacddff", name="swap default", ttype=TriggerType.HOVER, action="swap: default", warmup=1, repeatTime=1, modifiers="", centre=(center_x, center_y), dimensions=(key_height, key_width))
+            self.add_zone(return_to_default_zone)
             self.showZones = True
 
     def show_zone_for_list(self, names, corresponding_actions):
