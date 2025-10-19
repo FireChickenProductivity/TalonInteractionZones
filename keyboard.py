@@ -54,7 +54,10 @@ class Keyboard:
 			else:
 				self._held_modifiers.add(key.main_key)
 		else:
-			keys = list(self._held_modifiers) + [key.main_key]
+			if "shift" in self._held_modifiers:
+				keys = [modifier for modifier in self._held_modifiers if modifier != "shift"] + [key.secondary_key]
+			else:
+				keys = list(self._held_modifiers) + [key.main_key]
 			keystroke = "-".join(keys)
 			actions.key(keystroke)
 			self._held_modifiers.clear()
