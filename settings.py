@@ -6,9 +6,9 @@ DEFAULT_SHOW = False
 DEFAULT_FILE_NAME = "default"
 
 # Adjust the transparency of the zones overlay images [0, 255], where 255 is full opaque and 0 is invisible.
-ZONES_ALPHA = 100
+ZONES_ALPHA = 150
 # Adjust the transparency of the zones text [0, 255], where 255 is full opaque and 0 is invisible.
-ZONES_TEXT_ALPHA = 255
+ZONES_TEXT_ALPHA = 150
 
 # Customize the position in screen pixels of the zone toggle switch (0,0 is the top left of the screen)
 ZONE_TOGGLE_OVERRIDE_POSITION = False

@@ -5,7 +5,7 @@ from .settings import *
 
 class Zone:
     def __init__(self,color,centre,name,ttype,action,warmup,repeatTime,modifiers, height= 80, width= 80) -> None:
-        self.color=color
+        self.color=rgba2hex(0,0,0,ZONES_ALPHA)
         self.centre=(round(centre[0]), round(centre[1]))
         self.name=name
         self.triggerType=ttype
@@ -83,7 +83,7 @@ class Zone:
         x=self.left
         y=self.centre[1]
         
-        paint.color = "000000"
+        paint.color = self.color
         canvas.draw_rect(self.rectangle)
         paint.color = self.textColor
         canvas.draw_text(text,x,y-tr.y)
