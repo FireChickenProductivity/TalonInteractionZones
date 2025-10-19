@@ -15,7 +15,7 @@ class ActionQueue:
 			self.queue.pop()
 
 	def get_items(self):
-		return [i for i in self.queue]
+		return sorted([i for i in self.queue])
 
 QUEUE_SIZE = 100
 insert_queue = ActionQueue(QUEUE_SIZE)
