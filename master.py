@@ -175,7 +175,8 @@ class Master:
         top = self.zonesRect.top
         height = self.zonesRect.height
         width = self.zonesRect.width
-        number_per_row_and_column = math.ceil(math.sqrt(len(names)))
+        number_of_actions = len(names) + 1 # add one for the return action
+        number_per_row_and_column = math.ceil(math.sqrt(number_of_actions))
         zone_width = math.floor(width/number_per_row_and_column)
         zone_height = math.floor(height/number_per_row_and_column)
         zone_dimensions = (math.floor(0.65*zone_height), math.floor(0.65*zone_width))
