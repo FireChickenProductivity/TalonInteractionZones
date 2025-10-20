@@ -38,7 +38,7 @@ class Keyboard:
 			[Key("tab")] + [create_letter_key(c) for c in "qwertyuiop"] + [Key("[", "{"), Key("]", "}"), Key("\\", "|")],
 			[create_letter_key(c) for c in "asdfghjkl"] + [Key(";", ":"), Key("'", '"'), Key("enter")],
 			[Key("shift", is_modifier=True)] + [create_letter_key(c) for c in "zxcvbnm"] + [Key(",", "<"), Key(".", ">"), Key("/", "?"), Key("rshift", is_modifier=True)],
-			[Key("ctrl", is_modifier=True), Key("alt", is_modifier=True), Key("super", is_modifier=True), Key("space"), Key("rctrl", is_modifier=True), Key("ralt", is_modifier=True), Key("left"), Key("down"), Key("up"), Key("right")]
+			[Key("ctrl", is_modifier=True), Key("alt", is_modifier=True), Key("super", is_modifier=True), Key("space"), Key("rctrl", is_modifier=True), Key("ralt", is_modifier=False), Key("left"), Key("down"), Key("up"), Key("right")]
 		]
 		self.x: int = 20
 		self.y: int = 20

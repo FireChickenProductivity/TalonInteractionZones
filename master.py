@@ -50,7 +50,7 @@ class Master:
         self.overrideZoneSet=None
         self.updateTriggered=False
         self.keyboard: Keyboard = Keyboard()
-        self.keyboard.update_size(self.screen.width//2, self.screen.height//2)
+        self.keyboard.update_size(self.screen.width, self.screen.height//2)
 
     def set_zone_override(self,zoneSet):
         self.overrideZoneSet=zoneSet
@@ -176,13 +176,16 @@ class Master:
             x = self.keyboard.x
             y = self.keyboard.y
             key_height = self.keyboard.compute_key_height()
+            adjusted_height = round(key_height * 0.65)
             for row_index in range(len(self.keyboard.rows)):
                 key_width = self.keyboard.compute_row_key_width(row_index)
+                adjusted_width = round(key_width * 0.65)
                 for key in self.keyboard.rows[row_index]:
                     key_text = f"{key.main_key} / {key.secondary_key}" if key.secondary_key else key.main_key
                     center_x = x + key_width // 2
                     center_y = y + key_height // 2
-                    zone = SimpleZone(color="#7aacddff", name=key_text, ttype=TriggerType.HOVER, action=create_key_operator(key), warmup=1, repeatTime=1, modifiers="", centre=(center_x, center_y), dimensions=(key_height, key_width))
+                    zone = SimpleZone(color="#7aacddff", name=key_text, ttype=TriggerType.HOVER, action=create_key_operator(key), warmup=1, repeatTime=1, modifiers="", centre=(center_x, center_y), dimensions=(adjusted_height, adjusted_width))
+                    
                     self.add_zone(zone)
                     x += key_width
                 y += key_height
