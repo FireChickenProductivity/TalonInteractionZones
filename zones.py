@@ -5,6 +5,7 @@ from .settings import *
 
 class Zone:
     def __init__(self,color,centre,name,ttype,action,warmup,repeatTime,modifiers, height= 80, width= 80) -> None:
+        self.id = -1
         self.color=rgba2hex(0,0,0,ZONES_ALPHA)
         self.centre=(round(centre[0]), round(centre[1]))
         self.name=name
@@ -106,6 +107,12 @@ class Zone:
             for y in range(self.height):
                 position = (self.left + x, self.top + y)
                 map[position] = id
+
+    def remove_from_map(self, map):
+        for x in range(self.width):
+            for y in range(self.height):
+                position = (self.left + x, self.top + y)
+                map.pop(position)
     
 class TriggerZone(Zone):
     def __init__(self, color, centre, name, ttype, action, warmup, repeatTime,modifiers:str,action2) -> None:

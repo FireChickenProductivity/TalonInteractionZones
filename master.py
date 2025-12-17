@@ -278,8 +278,13 @@ class Master:
 
     def add_zone(self, zone):
         zone_id = len(self.zones)
+        zone.id = zone_id
         self.zones[zone_id]=zone
         zone.add_to_map(self.color_map, zone_id)
+
+    def remove_zone(self, zone):
+        self.zones.pop(zone.id)
+        zone.remove_from_map(self.color_map)
             
     def disable(self) -> None:        
         self.canvas.unregister("draw", self.draw) 
