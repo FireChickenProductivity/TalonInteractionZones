@@ -27,7 +27,8 @@ class Master:
     __slots__ = (
         'displays', 'showZones', 'screen', 'screenRect', 'zonesRect', 'canvas', 'zones', 'configs',
         'activeID', 'toggleRect', 'lastWindowTitle', 'activeZoneSet', 'overrideZoneSet', 'updateTriggered',
-        'keyboard', 'job', 'job2', 'color_map', 'text_areas')
+        'keyboard', 'job', 'job2', 'color_map', 'text_areas',
+        'temporary_zones')
     def __init__(self) -> None:
         self.displays = {}
         self.showZones = False
@@ -57,6 +58,7 @@ class Master:
         self.updateTriggered=False
         self.keyboard: Keyboard = Keyboard(self.update_keyboard_current_text)
         self.keyboard.update_size(self.screen.width, self.screen.height//2)
+        self.temporary_zones = []
 
     def set_zone_override(self,zoneSet):
         self.overrideZoneSet=zoneSet
@@ -207,6 +209,7 @@ class Master:
 
     def update_keyboard_current_text(self, text: str):
         self.text_areas[0].text = text
+        self.remove_temporary_zones()
         if text:
             snippet_names = compute_active_snippet_names()
             matching_snippet_names = [
@@ -229,19 +232,21 @@ class Master:
                 return lambda: snippet_action(name)
                 
             for name in matching_snippet_names:
-                self.add_zone(
-                    SimpleZone(
-                        "",
-                        (x + width//2, y + height//2),
-                        name,
-                        TriggerType.HOVER,
-                        create_snippet_lambda(name),
-                        1,
-                        1,
-                        "",
-                        (height//2, width//2)
-                    )
+                zone = SimpleZone(
+                    "",
+                    (x + width//2, y + height//2),
+                    name,
+                    TriggerType.HOVER,
+                    create_snippet_lambda(name),
+                    1,
+                    1,
+                    "",
+                    (height//2, width//2)
                 )
+                self.add_zone(
+                    zone
+                )
+                self.temporary_zones.append(zone)
                 x += width
 
                 
@@ -310,6 +315,11 @@ class Master:
         self.zones[zone_id]=zone
         zone.add_to_map(self.color_map, zone_id)
 
+    def remove_temporary_zones(self):
+        for zone in self.temporary_zones:
+            self.remove_zone(zone)
+        self.temporary_zones.clear()
+
     def remove_zone(self, zone):
         self.zones.pop(zone.id)
         zone.remove_from_map(self.color_map)
@@ -353,10 +363,11 @@ class Master:
 
         paint.color = rgba2hex(255,255,255,ZONES_ALPHA)
         
-        for c in self.zones:
-            self.zones[c].draw(canvas)
+        zones = self.zones.copy()
+        for z in zones.values():
+            z.draw(canvas)
         
-        for t in self.text_areas:
+        for t in self.text_areas.copy():
             draw_text_area(canvas, t)
     
     def on_mouse(self, event):
@@ -394,10 +405,10 @@ class Master:
             
             if self.activeID != TRANSPARENT and self.activeID is not None:
                 block = True
-                
-            for zoneID in self.zones:
+            
+            for zoneID, zone in self.zones.copy().items():
                 isHovering = zoneID==self.activeID
-                self.zones[zoneID].update(isHovering)
+                zone.update(isHovering)
                 
         self.canvas.blocks_mouse = block
             
