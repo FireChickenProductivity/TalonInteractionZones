@@ -92,3 +92,5 @@ class Keyboard:
 	def compute_key_height(self) -> int:
 		return int(self._height // len(self.rows))
 		
+	def get_width(self) -> int:
+		return self._width

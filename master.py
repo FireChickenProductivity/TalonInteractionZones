@@ -85,18 +85,8 @@ class Master:
         if name in SPECIAL_ZONE_NAMES:
             self.activeZoneSet = name
         if name == SNIPPET_ZONE_NAME:
-            snippet_names = actions.user.get_snippet_names()
             self.color_map = {}
-            relevant_snippet_names = []
-            for snippet_name in snippet_names:
-                # make an appropriate zone?
-                try:
-                    snippet = actions.user.get_snippet(snippet_name)
-                    if snippet:
-                        relevant_snippet_names.append(snippet_name)
-                except Exception:
-                    pass
-            relevant_snippet_names = sorted(relevant_snippet_names)
+            relevant_snippet_names = compute_active_snippet_names()
             insert_actions = ["snippet: " + name for name in relevant_snippet_names]
             self.show_zone_for_list(relevant_snippet_names, insert_actions)
         elif name == RECENT_INSERTS_ZONE_NAME:
@@ -217,6 +207,36 @@ class Master:
 
     def update_keyboard_current_text(self, text: str):
         self.text_areas[0].text = text
+        if text:
+            snippet_names = compute_active_snippet_names()
+            matching_snippet_names = [
+                name for name in snippet_names
+                if name.startswith(text)
+            ]
+            
+            if not matching_snippet_names:
+                return 
+            x = self.keyboard.x
+            height = self.keyboard.compute_key_height()
+            y = (len(self.keyboard.rows)+1)*height + self.keyboard.y
+            width = round(self.keyboard.get_width()//len(matching_snippet_names))
+            for name in matching_snippet_names:
+                self.add_zone(
+                    SimpleZone(
+                        "",
+                        (x + width//2, y + height//2),
+                        name,
+                        TriggerType.HOVER,
+                        "snippet: " + name,
+                        1,
+                        1,
+                        "",
+                        (height//2, width//2)
+                    )
+                )
+                x += width
+
+                
 
     def show_zone_for_list(self, names, corresponding_actions):
         if len(names) != len(corresponding_actions):
@@ -506,4 +526,16 @@ def is_special_zone(override_name) -> bool:
 
 def compute_special_zone_name(override_name: str) -> str:
     return override_name[len(SPECIAL_SWAP_NAME_PREFIX):]
-    
+
+def compute_active_snippet_names() -> list[str]:
+    snippet_names = actions.user.get_snippet_names()
+    relevant_snippet_names = []
+    for snippet_name in snippet_names:
+        try:
+            snippet = actions.user.get_snippet(snippet_name)
+            if snippet:
+                relevant_snippet_names.append(snippet_name)
+        except Exception:
+            pass
+    relevant_snippet_names = sorted(relevant_snippet_names)
+    return relevant_snippet_names
