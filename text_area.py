@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from talon.skia import Rect
 
-@dataclass
+@dataclass(slots=True)
 class TextArea:
 	"""Displays text that cannot be interacted with"""
 	text: str
