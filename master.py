@@ -169,32 +169,35 @@ class Master:
             corresponding_actions = [create_lambda(operator_name) for operator_name in operator_names]
             self.show_zone_for_list(operator_names, corresponding_actions)
         elif name == KEYBOARD_ZONE_NAME:
-            def create_key_operator(key: Key):
-                return lambda: self.keyboard.handle_keypress(key)
+            self.show_keyboard()
+
+    def show_keyboard(self):
+        def create_key_operator(key: Key):
+            return lambda: self.keyboard.handle_keypress(key)
                 
-            self.color_map = {}
+        self.color_map = {}
+        x = self.keyboard.x
+        y = self.keyboard.y
+        key_height = self.keyboard.compute_key_height()
+        adjusted_height = round(key_height * 0.65)
+        for row_index in range(len(self.keyboard.rows)):
+            key_width = self.keyboard.compute_row_key_width(row_index)
+            adjusted_width = round(key_width * 0.65)
+            for key in self.keyboard.rows[row_index]:
+                key_text = f"{key.main_key} / {key.secondary_key}" if key.secondary_key else key.main_key
+                center_x = x + key_width // 2
+                center_y = y + key_height // 2
+                zone = SimpleZone(color="#7aacddff", name=key_text, ttype=TriggerType.HOVER, action=create_key_operator(key), warmup=1, repeatTime=1, modifiers="", centre=(center_x, center_y), dimensions=(adjusted_height, adjusted_width))
+                
+                self.add_zone(zone)
+                x += key_width
+            y += key_height
             x = self.keyboard.x
-            y = self.keyboard.y
-            key_height = self.keyboard.compute_key_height()
-            adjusted_height = round(key_height * 0.65)
-            for row_index in range(len(self.keyboard.rows)):
-                key_width = self.keyboard.compute_row_key_width(row_index)
-                adjusted_width = round(key_width * 0.65)
-                for key in self.keyboard.rows[row_index]:
-                    key_text = f"{key.main_key} / {key.secondary_key}" if key.secondary_key else key.main_key
-                    center_x = x + key_width // 2
-                    center_y = y + key_height // 2
-                    zone = SimpleZone(color="#7aacddff", name=key_text, ttype=TriggerType.HOVER, action=create_key_operator(key), warmup=1, repeatTime=1, modifiers="", centre=(center_x, center_y), dimensions=(adjusted_height, adjusted_width))
-                    
-                    self.add_zone(zone)
-                    x += key_width
-                y += key_height
-                x = self.keyboard.x
-            center_x = x + key_width // 2
-            center_y = y + key_height // 2
-            return_to_default_zone = SimpleZone(color="#7aacddff", name="swap default", ttype=TriggerType.HOVER, action="swap: default", warmup=1, repeatTime=1, modifiers="", centre=(center_x, center_y), dimensions=(key_height, key_width))
-            self.add_zone(return_to_default_zone)
-            self.showZones = True
+        center_x = x + key_width // 2
+        center_y = y + key_height // 2
+        return_to_default_zone = SimpleZone(color="#7aacddff", name="swap default", ttype=TriggerType.HOVER, action="swap: default", warmup=1, repeatTime=1, modifiers="", centre=(center_x, center_y), dimensions=(key_height, key_width))
+        self.add_zone(return_to_default_zone)
+        self.showZones = True
 
     def show_zone_for_list(self, names, corresponding_actions):
         if len(names) != len(corresponding_actions):
