@@ -1,6 +1,7 @@
 from talon import actions
 
 class Key:
+	__slots__ = ('main_key', 'secondary_key', 'is_modifier')
 	def __init__(self, main_key: str, secondary_key: str | None = None, is_modifier: bool = False):
 		"""Represents a key on the virtual keyboard.
 
@@ -25,10 +26,12 @@ def create_letter_key(character: str):
 	return Key(character.lower(), character.upper())
 
 class Keyboard:
+	__slots__ = ('_held_modifiers', 'rows', 'x', 'y', '_height', '_width', 'current_text')
 	def __init__(self):
 		"""Represents a virtual keyboard where keys can be pressed through eye tracking.
 			This provides the information needed to create the interaction zones but does not
 			handle eye tracking input itself."""
+		self.current_text = ""
 		self._held_modifiers = set()
 		self.rows = [
 			[Key("esc"), Key("f1"), Key("f2"), Key("f3"), Key("f4"), Key("f5"), Key("f6"), Key("f7"), Key("f8"), Key("f9"), Key("f10"), Key("f11"), Key("f12")],
@@ -60,9 +63,17 @@ class Keyboard:
 				else:
 					keys = list(self._held_modifiers) + [key.main_key]
 				keystroke = "-".join(keys)
+				self.update_current_text(keystroke)
 				actions.key(keystroke)
 			finally:
 				self._held_modifiers.clear()
+
+	def update_current_text(self, keystroke):
+		"""Keep track of consecutively dictated letters"""
+		if keystroke.isalpha() and len(keystroke) == 1:
+			self.current_text += keystroke
+		else:
+			self.current_text = ""
 
 	def update_size(self, width, height):
 		self._width = width
