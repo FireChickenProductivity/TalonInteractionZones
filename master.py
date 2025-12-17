@@ -220,6 +220,14 @@ class Master:
             height = self.keyboard.compute_key_height()
             y = (len(self.keyboard.rows)+1)*height + self.keyboard.y
             width = round(self.keyboard.get_width()//len(matching_snippet_names))
+            def snippet_action(name: str):
+                for _ in range(len(text)):
+                    actions.edit.delete()
+                actions.user.insert_snippet_by_name(name)
+                self.set_zone_override(DEFAULT_FILE_NAME)
+            def create_snippet_lambda(name):
+                return lambda: snippet_action(name)
+                
             for name in matching_snippet_names:
                 self.add_zone(
                     SimpleZone(
@@ -227,7 +235,7 @@ class Master:
                         (x + width//2, y + height//2),
                         name,
                         TriggerType.HOVER,
-                        "snippet: " + name,
+                        create_snippet_lambda(name),
                         1,
                         1,
                         "",
