@@ -278,8 +278,6 @@ class Master:
         self.canvas.blocks_mouse = False
         
     def draw(self, canvas) -> None:  
-        x, y = ctrl.mouse_pos()
-        
         paint = canvas.paint
                 
         if self.showZones:
