@@ -1,5 +1,5 @@
 from talon import ui, canvas, cron, ctrl, actions
-from talon.skia import Rect, Image
+from talon.skia import Rect
 import os
 import math
 from typing import Union, Callable
@@ -297,11 +297,9 @@ class Master:
             return
 
         paint.color = rgba2hex(255,255,255,ZONES_ALPHA)
-        #canvas.draw_image(self.img, 0,0)
         
         for c in self.zones:
             self.zones[c].draw(canvas)
-        pass
     
     def on_mouse(self, event):
         x, y = ctrl.mouse_pos()  
