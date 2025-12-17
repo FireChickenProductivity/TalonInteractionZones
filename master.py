@@ -23,6 +23,10 @@ KEYBOARD_ZONE_NAME = "KEYBOARD"
 SPECIAL_ZONE_NAMES = set([SNIPPET_ZONE_NAME, OPERATOR_ZONE_NAME, RECENT_INSERTS_ZONE_NAME, RECENT_KEYSTROKES_ZONE_NAME, KEYBOARD_ZONE_NAME])
 
 class Master:
+    __slots__ = (
+        'displays', 'showZones', 'screen', 'screenRect', 'zonesRect', 'canvas', 'zones', 'configs',
+        'activeID', 'toggleRect', 'lastWindowTitle', 'activeZoneSet', 'overrideZoneSet', 'updateTriggered',
+        'keyboard', 'job', 'job2', 'color_map')
     def __init__(self) -> None:
         self.displays = {}
         self.showZones = False
