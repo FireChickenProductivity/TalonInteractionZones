@@ -8,6 +8,7 @@ from .config_parser import parse_zone,is_line_newzone,is_line_endzone
 from .settings import *
 from .zones import SimpleZone
 from .keyboard import Keyboard, Key
+from .text_area import TextArea, draw_text_area
 
 HOME_DIRECTORY = verify_home_dir()
 ZONE_SIZE = 200
@@ -26,10 +27,11 @@ class Master:
     __slots__ = (
         'displays', 'showZones', 'screen', 'screenRect', 'zonesRect', 'canvas', 'zones', 'configs',
         'activeID', 'toggleRect', 'lastWindowTitle', 'activeZoneSet', 'overrideZoneSet', 'updateTriggered',
-        'keyboard', 'job', 'job2', 'color_map')
+        'keyboard', 'job', 'job2', 'color_map', 'text_areas')
     def __init__(self) -> None:
         self.displays = {}
         self.showZones = False
+        self.text_areas = []
         
         # I am not sure about multiple screens here, but it could be theoretically supported
         screens = ui.screens()
@@ -53,7 +55,7 @@ class Master:
         self.activeZoneSet = ""
         self.overrideZoneSet=None
         self.updateTriggered=False
-        self.keyboard: Keyboard = Keyboard()
+        self.keyboard: Keyboard = Keyboard(self.update_keyboard_current_text)
         self.keyboard.update_size(self.screen.width, self.screen.height//2)
 
     def set_zone_override(self,zoneSet):
@@ -72,6 +74,7 @@ class Master:
         self.showZones = False
         self.activeZoneSet=""
         self.zones = dict()
+        self.text_areas = []
         if is_special_zone(self.overrideZoneSet):
             self.show_special_zone_set()
         else:
@@ -202,6 +205,18 @@ class Master:
         return_to_default_zone = SimpleZone(color="#7aacddff", name="swap default", ttype=TriggerType.HOVER, action="swap: default", warmup=1, repeatTime=1, modifiers="", centre=(center_x, center_y), dimensions=(key_height, key_width))
         self.add_zone(return_to_default_zone)
         self.showZones = True
+        self.text_areas.append(TextArea(
+            "",
+            self.keyboard.x,
+            self.keyboard.y,
+            200,
+            30,
+            rgba2hex(255,255,255,ZONES_TEXT_ALPHA),
+            "#7aacddff",
+        ))
+
+    def update_keyboard_current_text(self, text: str):
+        self.text_areas[0].text = text
 
     def show_zone_for_list(self, names, corresponding_actions):
         if len(names) != len(corresponding_actions):
@@ -307,6 +322,9 @@ class Master:
         
         for c in self.zones:
             self.zones[c].draw(canvas)
+        
+        for t in self.text_areas:
+            draw_text_area(canvas, t)
     
     def on_mouse(self, event):
         x, y = ctrl.mouse_pos()  

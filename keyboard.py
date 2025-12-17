@@ -26,8 +26,8 @@ def create_letter_key(character: str):
 	return Key(character.lower(), character.upper())
 
 class Keyboard:
-	__slots__ = ('_held_modifiers', 'rows', 'x', 'y', '_height', '_width', 'current_text')
-	def __init__(self):
+	__slots__ = ('_held_modifiers', 'rows', 'x', 'y', '_height', '_width', 'current_text', 'current_text_callback')
+	def __init__(self, current_text_callback):
 		"""Represents a virtual keyboard where keys can be pressed through eye tracking.
 			This provides the information needed to create the interaction zones but does not
 			handle eye tracking input itself."""
@@ -47,6 +47,7 @@ class Keyboard:
 		self.y: int = 20
 		self._height: int = 0
 		self._width: int = 0
+		self.current_text_callback = current_text_callback
 
 	def handle_keypress(self, key: Key):
 		"""Handles a key press event, updating the state of held modifiers.
@@ -72,8 +73,12 @@ class Keyboard:
 		"""Keep track of consecutively dictated letters"""
 		if keystroke.isalpha() and len(keystroke) == 1:
 			self.current_text += keystroke
+		elif len(self.current_text) > 0 and keystroke == "backspace":
+			new_text_end = len(self.current_text)-1
+			self.current_text = self.current_text[:new_text_end]
 		else:
 			self.current_text = ""
+		self.current_text_callback(self.current_text)
 
 	def update_size(self, width, height):
 		self._width = width
