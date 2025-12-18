@@ -206,6 +206,7 @@ class Master:
     def update_keyboard_current_text(self, text: str):
         self.zone_manager.update_text_area_text(0, text)
         self.zone_manager.remove_temporary_zones()
+        row_number: int = 0
         if text:
             snippet_names = compute_active_snippet_names()
             matching_snippet_names = [
@@ -213,39 +214,47 @@ class Master:
                 if name.startswith(text)
             ]
             
-            if not matching_snippet_names:
-                return 
-            x = self.keyboard.x
-            height = self.keyboard.compute_key_height()
-            y = (len(self.keyboard.rows)+1)*height + self.keyboard.y
-            width = round(self.keyboard.get_width()//len(matching_snippet_names))
-            def snippet_action(name: str):
-                for _ in range(len(text)):
-                    actions.edit.delete()
-                actions.user.insert_snippet_by_name(name)
-                self.set_zone_override(DEFAULT_FILE_NAME)
-            def create_snippet_lambda(name):
-                return lambda: snippet_action(name)
+            if matching_snippet_names:
+                row_number += 1
+                def snippet_action(name: str):
+                    for _ in range(len(text)):
+                        actions.edit.delete()
+                    actions.user.insert_snippet_by_name(name)
+                def create_snippet_lambda(name):
+                    return lambda: snippet_action(name)
+                corresponding_actions = [create_snippet_lambda(name) for name in matching_snippet_names]
+                self.add_temporary_keyboard_row(snippet_names, corresponding_actions, row_number)
                 
-            for name in matching_snippet_names:
-                zone = SimpleZone(
-                    "",
-                    (x + width//2, y + height//2),
-                    name,
-                    TriggerType.HOVER,
-                    create_snippet_lambda(name),
-                    1,
-                    1,
-                    "",
-                    (height//2, width//2)
-                )
-                self.zone_manager.add_temporary_zone(
-                    zone
-                )
-                x += width
-
-                
-
+    def add_temporary_keyboard_row(self, names, corresponding_actions, row_number: int):
+        """
+            Add a row at the bottom of the keyboard with
+            names as the display text and corresponding_actions
+            as the actions to perform on interaction
+            row_number: the number for the additional row
+            starts from 1
+        """
+        x = self.keyboard.x
+        height = self.keyboard.compute_key_height()
+        y = (len(self.keyboard.rows)+row_number)*height + self.keyboard.y
+        width = round(self.keyboard.get_width()//len(names))
+        for i in range(len(names)):
+            name = names[i]
+            zone = SimpleZone(
+                "",
+                (x + width//2, y + height//2),
+                name,
+                TriggerType.HOVER,
+                corresponding_actions[i],
+                1,
+                1,
+                "",
+                (height//2, width//2)
+            )
+            self.zone_manager.add_temporary_zone(
+                zone
+            )
+            x += width
+        
     def show_zone_for_list(self, names, corresponding_actions):
         if len(names) != len(corresponding_actions):
             print("The number of names in the list did not match the number of actions!")
