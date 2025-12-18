@@ -223,7 +223,7 @@ class Master:
                 def create_snippet_lambda(name):
                     return lambda: snippet_action(name)
                 corresponding_actions = [create_snippet_lambda(name) for name in matching_snippet_names]
-                self.add_temporary_keyboard_row(snippet_names, corresponding_actions, row_number)
+                self.add_temporary_keyboard_row(matching_snippet_names, corresponding_actions, row_number)
                 
     def add_temporary_keyboard_row(self, names, corresponding_actions, row_number: int):
         """
