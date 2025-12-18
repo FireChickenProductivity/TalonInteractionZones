@@ -224,6 +224,18 @@ class Master:
                     return lambda: snippet_action(name)
                 corresponding_actions = [create_snippet_lambda(name) for name in matching_snippet_names]
                 self.add_temporary_keyboard_row(matching_snippet_names, corresponding_actions, row_number)
+            word_completions = actions.user.interaction_zones_get_completions(text.lower(), 20)
+            if word_completions:
+                row_number += 1
+                def completion_action(completion):
+                    original = text
+                    extra = completion[len(original):]
+                    actions.insert(extra)
+                def create_completion_lambda(completion):
+                    return lambda: completion_action(completion)
+                corresponding_actions = [create_completion_lambda(c) for c in word_completions]
+                self.add_temporary_keyboard_row(word_completions, corresponding_actions, row_number)
+                
                 
     def add_temporary_keyboard_row(self, names, corresponding_actions, row_number: int):
         """
