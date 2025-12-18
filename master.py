@@ -28,7 +28,7 @@ class Master:
     __slots__ = (
         'displays', 'showZones', 'screen', 'screenRect', 'zonesRect', 'canvas', 'configs',
         'activeID', 'toggleRect', 'lastWindowTitle', 'activeZoneSet', 'overrideZoneSet', 'updateTriggered',
-        'keyboard', 'job', 'job2', 'zone_manager')
+        'keyboard', 'job', 'job2', 'zone_manager', 'previous_zone')
     def __init__(self) -> None:
         self.displays = {}
         self.showZones = False
@@ -53,14 +53,22 @@ class Master:
         
         self.lastWindowTitle = ""
         self.activeZoneSet = ""
+        self.previous_zone = ""
         self.overrideZoneSet=None
         self.updateTriggered=False
         self.keyboard: Keyboard = Keyboard(self.update_keyboard_current_text)
         self.keyboard.update_size(self.screen.width, self.screen.height//2)
 
     def set_zone_override(self,zoneSet):
+        self.previous_zone = self.overrideZoneSet
         self.overrideZoneSet=zoneSet
         self.updateTriggered = True
+
+    def return_to_previous_zone(self):
+        if self.previous_zone:
+            self.set_zone_override(self.previous_zone)
+        else:
+            self.set_zone_override(DEFAULT_FILE_NAME)
 
     def enable(self,showZones) -> None:  
         self.canvas.register("draw", self.draw)        
@@ -90,7 +98,7 @@ class Master:
         elif name == RECENT_INSERTS_ZONE_NAME:
             recent_inserts = actions.user.fire_chicken_interaction_zones_get_recent_inserts()
             def insert_text(text):
-                self.set_zone_override(DEFAULT_FILE_NAME)
+                self.return_to_previous_zone()
                 actions.insert(text)
             def create_insert_operator(text):
                 return lambda: insert_text(text)
@@ -99,7 +107,7 @@ class Master:
         elif name == RECENT_KEYSTROKES_ZONE_NAME:
             recent_keystrokes = actions.user.fire_chicken_interaction_zones_get_recent_keystrokes()
             def press_keystroke(keystroke):
-                self.set_zone_override(DEFAULT_FILE_NAME)
+                self.return_to_previous_zone()
                 actions.key(keystroke)
             def create_operator(keystroke):
                 return lambda: press_keystroke(keystroke)
@@ -158,7 +166,7 @@ class Master:
                     actions.user.code_operator(operator_name)
                 except Exception as ex:
                     print('operator_name', operator_name)
-                self.set_zone_override(DEFAULT_FILE_NAME)
+                self.return_to_previous_zone()
             def create_lambda(operator_name):
                 return lambda: insert_operator(operator_name)
             corresponding_actions = [create_lambda(operator_name) for operator_name in operator_names]
@@ -190,8 +198,20 @@ class Master:
             x = self.keyboard.x
         center_x = x + key_width // 2
         center_y = y + key_height // 2
-        return_to_default_zone = SimpleZone(color="#7aacddff", name="swap default", ttype=TriggerType.HOVER, action="swap: default", warmup=1, repeatTime=1, modifiers="", centre=(center_x, center_y), dimensions=(key_height, key_width))
-        self.zone_manager.add_zone(return_to_default_zone)
+        swap_zones = (
+            ("default", "default"),
+            ("operator", ":OPERATOR"),
+        )
+        for name, target in swap_zones:
+            zone = create_simple_zone(
+                "swap " + name,
+                "swap: " + target,
+                (center_x, center_y),
+                (key_height, key_width)
+            )
+            self.zone_manager.add_zone(zone)
+            center_x += key_width*2
+        
         self.showZones = True
         self.zone_manager.add_text_area(TextArea(
             "",
@@ -499,11 +519,11 @@ def primative_interaction(action:Union[Callable, str]):
                 print("Snippet interaction zone action is missing name!")
             else:
                 actions.user.insert_snippet_by_name(snippet_name)
-                master.set_zone_override(DEFAULT_FILE_NAME)
+                master.return_to_previous_zone()
         elif action.startswith(OPERATOR_ACTION_PREFIX):
             operator_name = action[len(OPERATOR_ACTION_PREFIX):]
             actions.user.code_operator(operator_name)
-            master.set_zone_override(DEFAULT_FILE_NAME)
+            master.return_to_previous_zone()
         elif not (action.startswith(' ') or action.endswith(' ')):
             actions.key(action)
         else:
