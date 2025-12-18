@@ -231,6 +231,7 @@ class Master:
                     original = text
                     extra = completion[len(original):]
                     actions.insert(extra)
+                    self.keyboard.set_current_text(original + extra)
                 def create_completion_lambda(completion):
                     return lambda: completion_action(completion)
                 corresponding_actions = [create_completion_lambda(c) for c in word_completions]

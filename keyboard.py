@@ -80,6 +80,11 @@ class Keyboard:
 			self.current_text = ""
 		self.current_text_callback(self.current_text)
 
+	def set_current_text(self, text):
+		"""Update current text and call callback"""
+		self.current_text = text
+		self.current_text_callback(self.current_text)
+
 	def update_size(self, width, height):
 		self._width = width
 		self._height = height
