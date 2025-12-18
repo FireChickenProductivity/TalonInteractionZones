@@ -79,19 +79,21 @@ if __name__ == '__main__':
 			possibilities = prefixes.get_possibilities(prefix, len(source))
 			print('    possibilities', possibilities)
 
-		
-
-	test_recreates_source(["a"])
-	test_recreates_source(["ab", "b"])
-	test_recreates_source(["ab", "ba"])
 	longer_list = ["ab", "ba", "bad", "barn", "bread", "cow"]
-	test_recreates_source(longer_list)
-	test_recreates_source(longer_list, "a")
-	test_recreates_source(longer_list, "b")
-	test_recreates_source(longer_list, "c")
-	test_recreates_source(longer_list, "d")
-	test_recreates_source(longer_list, "ba")
-	test_recreates_source(longer_list, "bar")
-	test_recreates_source(longer_list, "barn")
-	test_recreates_source(longer_list, "bread")
-	test_recreates_source(longer_list, "breading")
+	test_cases = (
+		(["a"], ""),
+		(["ab", "b"], ""),
+		(["ab", "ba"], ""),
+		(longer_list, ""),
+		(longer_list, "a"),
+		(longer_list, "b"),
+		(longer_list, "c"),
+		(longer_list, "d"),
+		(longer_list, "ba"),
+		(longer_list, "bar"),
+		(longer_list, "barn"),
+		(longer_list, "bread"),
+		(longer_list, "breading"),
+	)
+	for test_case in test_cases:
+		test_recreates_source(*test_case)
