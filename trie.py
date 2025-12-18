@@ -56,24 +56,42 @@ class Trie:
 # for testing
 if __name__ == '__main__':
 	def create_from_iterable(source):
+		"""Create a trie on all the text in the source"""
 		prefixes = Trie("")
 		for text in source:
 			prefixes.add_text(text)
 		return prefixes
-	def recreates_source(source) -> bool:
+	def recreates_source(source, prefix: str="") -> bool:
+		"""Returns true if a trie can successfully recreate all the text in the source with the specified prefix"""
 		prefixes = create_from_iterable(source)
-		possibilities = prefixes.get_possibilities("", len(source))
-		return set(possibilities) == set(source)
+		possibilities = prefixes.get_possibilities(prefix, len(source))
+		expected = set([t for t in source if t.startswith(prefix)])
+		return set(possibilities) == expected
 
-	def test_recreates_source(source):
-		was_successful = recreates_source(source)
-		print(source, was_successful)
+	def test_recreates_source(source, prefix: str=""):
+		"""creates a trie on all the text in the source
+			and prints information on if all the information from that source can be recreated
+		"""
+		was_successful = recreates_source(source, prefix)
+		print(source, prefix, was_successful)
 		if not was_successful:
 			prefixes = create_from_iterable(source)
-			possibilities = prefixes.get_possibilities("", len(source))
+			possibilities = prefixes.get_possibilities(prefix, len(source))
 			print('    possibilities', possibilities)
+
+		
 
 	test_recreates_source(["a"])
 	test_recreates_source(["ab", "b"])
 	test_recreates_source(["ab", "ba"])
-	test_recreates_source(["ab", "ba", "bad", "barn", "bread", "cow"])
+	longer_list = ["ab", "ba", "bad", "barn", "bread", "cow"]
+	test_recreates_source(longer_list)
+	test_recreates_source(longer_list, "a")
+	test_recreates_source(longer_list, "b")
+	test_recreates_source(longer_list, "c")
+	test_recreates_source(longer_list, "d")
+	test_recreates_source(longer_list, "ba")
+	test_recreates_source(longer_list, "bar")
+	test_recreates_source(longer_list, "barn")
+	test_recreates_source(longer_list, "bread")
+	test_recreates_source(longer_list, "breading")
