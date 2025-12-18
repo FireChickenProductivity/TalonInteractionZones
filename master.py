@@ -173,10 +173,11 @@ class Master:
         x = self.keyboard.x
         y = self.keyboard.y
         key_height = self.keyboard.compute_key_height()
-        adjusted_height = round(key_height * 0.65)
+        scaling_factor = 0.50
+        adjusted_height = round(key_height * scaling_factor)
         for row_index in range(len(self.keyboard.rows)):
             key_width = self.keyboard.compute_row_key_width(row_index)
-            adjusted_width = round(key_width * 0.65)
+            adjusted_width = round(key_width * scaling_factor)
             for key in self.keyboard.rows[row_index]:
                 key_text = f"{key.main_key} / {key.secondary_key}" if key.secondary_key else key.main_key
                 center_x = x + key_width // 2
