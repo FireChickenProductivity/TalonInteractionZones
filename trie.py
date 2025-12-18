@@ -36,7 +36,8 @@ class Trie:
 					nested_character = nested_child.char
 					total = current_prefix + nested_character
 					if nested_character == "":
-						results.append(total)
+						if len(total) > len(prefix) + 1:
+							results.append(total)
 						if len(results) >= limit:
 							return results
 					else:
@@ -65,7 +66,8 @@ if __name__ == '__main__':
 		"""Returns true if a trie can successfully recreate all the text in the source with the specified prefix"""
 		prefixes = create_from_iterable(source)
 		possibilities = prefixes.get_possibilities(prefix, len(source))
-		expected = set([t for t in source if t.startswith(prefix)])
+		expected = set([t for t in source
+			if t.startswith(prefix) and len(t) > len(prefix) + 1])
 		return set(possibilities) == expected
 
 	def test_recreates_source(source, prefix: str=""):
