@@ -221,3 +221,10 @@ class SimpleZone(Zone):
         self.start_timers()
 
     
+def create_simple_zone(
+    name: str,
+    action,
+    center,
+    dimensions
+    ):
+    return SimpleZone(color="#7aacddff", name=name, ttype=TriggerType.HOVER, action=action, warmup=1, repeatTime=1, modifiers="", centre=center, dimensions=dimensions)

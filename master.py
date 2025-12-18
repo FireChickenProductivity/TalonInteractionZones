@@ -6,7 +6,7 @@ from typing import Union, Callable
 from .helpers import rgba2hex, verify_home_dir, TRANSPARENT, TriggerType
 from .config_parser import parse_zone,is_line_newzone,is_line_endzone
 from .settings import *
-from .zones import SimpleZone
+from .zones import SimpleZone, create_simple_zone
 from .keyboard import Keyboard, Key
 from .text_area import TextArea, draw_text_area
 from .zone_management import ZoneManager
@@ -293,11 +293,21 @@ class Master:
             self.zone_manager.add_zone(zone)
             zone_number += 1
         x, y = compute_dimensions(zone_number)
-        return_to_default_zone = SimpleZone(color="#7aacddff", name="swap default", ttype=TriggerType.HOVER, action="swap: default", warmup=1, repeatTime=1, modifiers="", centre=(x, y), dimensions=zone_dimensions)
+        return_to_default_zone = create_simple_zone(
+            "swap default",
+            "swap: default",
+            (x, y),
+            zone_dimensions
+        )
+        self.zone_manager.add_zone(return_to_default_zone)
         zone_number += 1
         x, y = compute_dimensions(zone_number)
-        self.zone_manager.add_zone(return_to_default_zone)
-        keyboard_zone = SimpleZone(color="#7aacddff", name="swap keyboard", ttype=TriggerType.HOVER, action="swap: :KEYBOARD", warmup=1, repeatTime=1, modifiers="", centre=(x, y), dimensions=zone_dimensions)
+        keyboard_zone = create_simple_zone(
+            "swap keyboard",
+            "swap: :KEYBOARD",
+            (x, y),
+            zone_dimensions
+        )
         self.zone_manager.add_zone(keyboard_zone)
         self.showZones = True
 
