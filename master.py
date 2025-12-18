@@ -277,7 +277,7 @@ class Master:
         top = self.zonesRect.top
         height = self.zonesRect.height
         width = self.zonesRect.width
-        number_of_actions = len(names) + 1 # add one for the return action
+        number_of_actions = len(names) + 2 # add 2 for navigation actions
         number_per_row_and_column = math.ceil(math.sqrt(number_of_actions))
         zone_width = math.floor(width/number_per_row_and_column)
         zone_height = math.floor(height/number_per_row_and_column)
@@ -294,7 +294,11 @@ class Master:
             zone_number += 1
         x, y = compute_dimensions(zone_number)
         return_to_default_zone = SimpleZone(color="#7aacddff", name="swap default", ttype=TriggerType.HOVER, action="swap: default", warmup=1, repeatTime=1, modifiers="", centre=(x, y), dimensions=zone_dimensions)
+        zone_number += 1
+        x, y = compute_dimensions(zone_number)
         self.zone_manager.add_zone(return_to_default_zone)
+        keyboard_zone = SimpleZone(color="#7aacddff", name="swap keyboard", ttype=TriggerType.HOVER, action="swap: :KEYBOARD", warmup=1, repeatTime=1, modifiers="", centre=(x, y), dimensions=zone_dimensions)
+        self.zone_manager.add_zone(keyboard_zone)
         self.showZones = True
 
     def show_file(self):
