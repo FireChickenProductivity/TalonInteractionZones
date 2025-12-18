@@ -307,17 +307,14 @@ class Master:
         self.canvas.unregister("mouse", self.on_mouse)
         cron.cancel(self.job)
         cron.cancel(self.job2)
-        self.canvas.blocks_mouse = False
     def hide(self):
         self.deactivate_zones()
         self.showZones = False        
-        self.canvas.blocks_mouse = False
        
     def deactivate_zones(self):
         if not self.showZones:
             return
         self.zone_manager.deactivate_zones()
-        self.canvas.blocks_mouse = False
         
     def draw(self, canvas) -> None:  
         paint = canvas.paint

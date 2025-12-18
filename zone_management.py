@@ -35,13 +35,16 @@ class ZoneManager:
 	def remove_temporary_zones(self):
 		with self.lock:
 			for zone in self.temporary_zones:
-				self.remove_zone(zone)
+				self._remove_zone(zone)
 			self.temporary_zones.clear()
 
 	def remove_zone(self, zone):
 		with self.lock:
-			self.zones.pop(zone.id)
-			zone.remove_from_map(self.color_map)
+			self._remove_zone(zone)
+
+	def _remove_zone(self, zone):
+		self.zones.pop(zone.id)
+		zone.remove_from_map(self.color_map)
 
 	def deactivate_zones(self):
 		zones = self.copy_zones()
