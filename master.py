@@ -9,6 +9,7 @@ from .settings import *
 from .zones import SimpleZone
 from .keyboard import Keyboard, Key
 from .text_area import TextArea, draw_text_area
+from .zone_management import ZoneManager
 
 HOME_DIRECTORY = verify_home_dir()
 ZONE_SIZE = 200
@@ -25,14 +26,13 @@ SPECIAL_ZONE_NAMES = set([SNIPPET_ZONE_NAME, OPERATOR_ZONE_NAME, RECENT_INSERTS_
 
 class Master:
     __slots__ = (
-        'displays', 'showZones', 'screen', 'screenRect', 'zonesRect', 'canvas', 'zones', 'configs',
+        'displays', 'showZones', 'screen', 'screenRect', 'zonesRect', 'canvas', 'configs',
         'activeID', 'toggleRect', 'lastWindowTitle', 'activeZoneSet', 'overrideZoneSet', 'updateTriggered',
-        'keyboard', 'job', 'job2', 'color_map', 'text_areas',
-        'temporary_zones')
+        'keyboard', 'job', 'job2', 'zone_manager')
     def __init__(self) -> None:
         self.displays = {}
         self.showZones = False
-        self.text_areas = []
+        self.zone_manager = ZoneManager()
         
         # I am not sure about multiple screens here, but it could be theoretically supported
         screens = ui.screens()
@@ -41,7 +41,6 @@ class Master:
         self.zonesRect = self.screenRect
         self.canvas = canvas.Canvas.from_screen(self.screen)
         
-        self.zones = dict()
         self.configs = dict()
         self.activeID=TRANSPARENT
         
@@ -58,7 +57,6 @@ class Master:
         self.updateTriggered=False
         self.keyboard: Keyboard = Keyboard(self.update_keyboard_current_text)
         self.keyboard.update_size(self.screen.width, self.screen.height//2)
-        self.temporary_zones = []
 
     def set_zone_override(self,zoneSet):
         self.overrideZoneSet=zoneSet
@@ -75,8 +73,7 @@ class Master:
     def show(self):
         self.showZones = False
         self.activeZoneSet=""
-        self.zones = dict()
-        self.text_areas = []
+        self.zone_manager.clear()
         if is_special_zone(self.overrideZoneSet):
             self.show_special_zone_set()
         else:
@@ -87,7 +84,6 @@ class Master:
         if name in SPECIAL_ZONE_NAMES:
             self.activeZoneSet = name
         if name == SNIPPET_ZONE_NAME:
-            self.color_map = {}
             relevant_snippet_names = compute_active_snippet_names()
             insert_actions = ["snippet: " + name for name in relevant_snippet_names]
             self.show_zone_for_list(relevant_snippet_names, insert_actions)
@@ -96,9 +92,9 @@ class Master:
             def insert_text(text):
                 self.set_zone_override(DEFAULT_FILE_NAME)
                 actions.insert(text)
-            def create_operator(text):
+            def create_insert_operator(text):
                 return lambda: insert_text(text)
-            insert_actions = [create_operator(text) for text in recent_inserts]
+            insert_actions = [create_insert_operator(text) for text in recent_inserts]
             self.show_zone_for_list(recent_inserts, insert_actions)
         elif name == RECENT_KEYSTROKES_ZONE_NAME:
             recent_keystrokes = actions.user.fire_chicken_interaction_zones_get_recent_keystrokes()
@@ -174,7 +170,6 @@ class Master:
         def create_key_operator(key: Key):
             return lambda: self.keyboard.handle_keypress(key)
                 
-        self.color_map = {}
         x = self.keyboard.x
         y = self.keyboard.y
         key_height = self.keyboard.compute_key_height()
@@ -188,16 +183,16 @@ class Master:
                 center_y = y + key_height // 2
                 zone = SimpleZone(color="#7aacddff", name=key_text, ttype=TriggerType.HOVER, action=create_key_operator(key), warmup=1, repeatTime=1, modifiers="", centre=(center_x, center_y), dimensions=(adjusted_height, adjusted_width))
                 
-                self.add_zone(zone)
+                self.zone_manager.add_zone(zone)
                 x += key_width
             y += key_height
             x = self.keyboard.x
         center_x = x + key_width // 2
         center_y = y + key_height // 2
         return_to_default_zone = SimpleZone(color="#7aacddff", name="swap default", ttype=TriggerType.HOVER, action="swap: default", warmup=1, repeatTime=1, modifiers="", centre=(center_x, center_y), dimensions=(key_height, key_width))
-        self.add_zone(return_to_default_zone)
+        self.zone_manager.add_zone(return_to_default_zone)
         self.showZones = True
-        self.text_areas.append(TextArea(
+        self.zone_manager.add_text_area(TextArea(
             "",
             self.keyboard.x,
             self.keyboard.y,
@@ -208,8 +203,8 @@ class Master:
         ))
 
     def update_keyboard_current_text(self, text: str):
-        self.text_areas[0].text = text
-        self.remove_temporary_zones()
+        self.zone_manager.update_text_area_text(0, text)
+        self.zone_manager.remove_temporary_zones()
         if text:
             snippet_names = compute_active_snippet_names()
             matching_snippet_names = [
@@ -243,10 +238,9 @@ class Master:
                     "",
                     (height//2, width//2)
                 )
-                self.add_zone(
+                self.zone_manager.add_temporary_zone(
                     zone
                 )
-                self.temporary_zones.append(zone)
                 x += width
 
                 
@@ -273,17 +267,16 @@ class Master:
         for n, action in zip(names, corresponding_actions):
             x, y = compute_dimensions(zone_number)
             zone = SimpleZone(color="#7aacddff", name=n, ttype=TriggerType.HOVER, action=action, warmup=1, repeatTime=1, modifiers="", centre=(x, y), dimensions=zone_dimensions)
-            self.add_zone(zone)
+            self.zone_manager.add_zone(zone)
             zone_number += 1
         x, y = compute_dimensions(zone_number)
         return_to_default_zone = SimpleZone(color="#7aacddff", name="swap default", ttype=TriggerType.HOVER, action="swap: default", warmup=1, repeatTime=1, modifiers="", centre=(x, y), dimensions=zone_dimensions)
-        self.add_zone(return_to_default_zone)
+        self.zone_manager.add_zone(return_to_default_zone)
         self.showZones = True
 
     def show_file(self):
         optimal_name = self.get_optimal_file_name()
         s=os.path.join(HOME_DIRECTORY, optimal_name)
-        self.color_map = {}
         try:
             with open("%s.txt" % (s),"r") as f:
                 lines = f.readlines()
@@ -297,7 +290,7 @@ class Master:
                     else:
                         z=parse_zone(ss)
                         if z != None:
-                            self.add_zone(z)
+                            self.zone_manager.add_zone(z)
                         else:
                             print("Failed to parse zone with config\n%s"%ss)
             
@@ -309,21 +302,6 @@ class Master:
             print("Either configuration file txt or image png not found (%s)."%s)
             return
 
-    def add_zone(self, zone):
-        zone_id = len(self.zones)
-        zone.id = zone_id
-        self.zones[zone_id]=zone
-        zone.add_to_map(self.color_map, zone_id)
-
-    def remove_temporary_zones(self):
-        for zone in self.temporary_zones:
-            self.remove_zone(zone)
-        self.temporary_zones.clear()
-
-    def remove_zone(self, zone):
-        self.zones.pop(zone.id)
-        zone.remove_from_map(self.color_map)
-            
     def disable(self) -> None:        
         self.canvas.unregister("draw", self.draw) 
         self.canvas.unregister("mouse", self.on_mouse)
@@ -338,8 +316,7 @@ class Master:
     def deactivate_zones(self):
         if not self.showZones:
             return
-        for c in self.zones:
-            self.zones[c].deactivate()
+        self.zone_manager.deactivate_zones()
         self.canvas.blocks_mouse = False
         
     def draw(self, canvas) -> None:  
@@ -363,11 +340,11 @@ class Master:
 
         paint.color = rgba2hex(255,255,255,ZONES_ALPHA)
         
-        zones = self.zones.copy()
+        zones = self.zone_manager.copy_zones()
         for z in zones.values():
             z.draw(canvas)
         
-        for t in self.text_areas.copy():
+        for t in self.zone_manager.copy_text_areas():
             draw_text_area(canvas, t)
     
     def on_mouse(self, event):
@@ -381,7 +358,7 @@ class Master:
         
         id = self.activeID
         if event.event=="mouseup" and id != TRANSPARENT:
-            self.zones[id].click()
+            self.zone_manager.click(id)
             pass
 
     def toggle_showing(self):
@@ -391,28 +368,10 @@ class Master:
             self.hide()
     
     def update(self):   
-        x, y = ctrl.mouse_pos()   
-        
-        block = False   
-        
-        if TOGGLE_ZONE_ENABLED and self.toggleRect.contains(x,y):
-            block = True
-             
         if self.showZones:        
             colorID = self.get_active_zone_id()
-            #if colorID!=None:
             self.activeID=colorID
-            
-            if self.activeID != TRANSPARENT and self.activeID is not None:
-                block = True
-            
-            for zoneID, zone in self.zones.copy().items():
-                isHovering = zoneID==self.activeID
-                zone.update(isHovering)
-                
-        self.canvas.blocks_mouse = block
-            
-        pass
+            self.zone_manager.update(self.activeID)
 
     def should_update(self):
         return self.updateTriggered or (not is_special_zone(self.overrideZoneSet) and (self.activeZoneSet != self.get_optimal_file_name()))
@@ -435,14 +394,7 @@ class Master:
         x, y = ctrl.mouse_pos() 
         if not self.zonesRect.contains(x,y):
             return TRANSPARENT
-        color = self.color_map.get((x,y), TRANSPARENT)
-        
-        
-        if color not in self.zones:
-            #print("There is no config matching %s!"%color) 
-            return None         
-              
-                
+        color = self.zone_manager.get_color(x, y)
         return color
       
     def get_optimal_file_name(self):
@@ -483,11 +435,13 @@ def setup():
     
 def primative_interaction(action:Union[Callable, str]):
     """All interactions ever fired are fired here."""
+    global master
+    if master is None:
+        return 
     if isinstance(action, Callable):
         action()
         return 
     
-    global master
     try:
         if action[:5]=="bind:":
             actions.user.keybinder_add_key_bind(action[6:].replace('\n',''))
@@ -495,16 +449,10 @@ def primative_interaction(action:Union[Callable, str]):
         elif action[:7]=="unbind:":
             actions.user.keybinder_remove_key_bind(action[8:].replace('\n',''))
         elif action[:5]=="swap:":
-            if (master==None):
-                print("Null master, please restart talon or report a bug if this persists.")
             master.set_zone_override(action[6:].strip())
         elif action == 'language': 
-            if (master==None):
-                print("Null master, please restart talon or report a bug if this persists.")
             zone_override = actions.code.language()
             master.set_zone_override(zone_override.replace('\n',''))
-        elif action[:6]=="start:":
-            os.startfile(action[7:].replace('\n',''))
         elif action[:12]=="scroll down:":
            actions.user.mouse_scroll_down(float(action[13:].replace('\n','')))     
         elif action[:10]=="scroll up:":
@@ -533,7 +481,8 @@ def primative_interaction(action:Union[Callable, str]):
 
 def toggle_showing():
     global master
-    master.toggle_showing()
+    if master is not None:
+        master.toggle_showing()
 
 def is_special_zone(override_name) -> bool:
     if override_name is None:
