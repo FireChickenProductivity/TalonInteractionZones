@@ -71,6 +71,7 @@ class Keyboard:
 
 	def update_current_text(self, keystroke):
 		"""Keep track of consecutively dictated letters"""
+		previous = self.current_text
 		if keystroke.isalpha() and len(keystroke) == 1:
 			self.current_text += keystroke
 		elif len(self.current_text) > 0 and keystroke == "backspace":
@@ -78,12 +79,13 @@ class Keyboard:
 			self.current_text = self.current_text[:new_text_end]
 		else:
 			self.current_text = ""
-		self.current_text_callback(self.current_text)
+		self.current_text_callback(self.current_text, previous)
 
 	def set_current_text(self, text):
 		"""Update current text and call callback"""
+		previous = self.current_text
 		self.current_text = text
-		self.current_text_callback(self.current_text)
+		self.current_text_callback(self.current_text, previous)
 
 	def update_size(self, width, height):
 		self._width = width

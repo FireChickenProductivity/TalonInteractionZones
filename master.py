@@ -184,7 +184,12 @@ class Master:
             "#7aacddff",
         ))
 
-    def update_keyboard_current_text(self, text: str):
+    def update_keyboard_current_text(self, text: str, previous: str):
+        """text: the current keyboard text
+            previous: the previous keyboard text
+        """
+        if (text == "") and (previous != "") and (len(previous) > 2):
+            actions.user.fire_chicken_interaction_zones_add_recent_insert(previous)
         self.zone_manager.update_text_area_text(0, text)
         self.zone_manager.remove_temporary_zones()
         row_number: int = 0

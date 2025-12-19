@@ -15,7 +15,7 @@ class ActionQueue:
 			self.queue.pop()
 
 	def get_items(self):
-		return sorted([i for i in self.queue])
+		return sorted([i for i in self.queue], key=lambda x: x.lower().strip())
 
 QUEUE_SIZE = 100
 insert_queue = ActionQueue(QUEUE_SIZE)
@@ -47,3 +47,7 @@ class Actions:
 	def fire_chicken_interaction_zones_get_recent_keystrokes():
 		"""Returns recent keystrokes"""
 		return key_queue.get_items()
+
+	def fire_chicken_interaction_zones_add_recent_insert(text: str):
+		"""Adds the specified text to queue of recent inserts"""
+		insert_queue.insert(text)
