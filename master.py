@@ -351,6 +351,8 @@ class Master:
         y = top
         delta_y = math.floor(height/len(options))
         zone_height = round(delta_y/2)
+        def create_lambda(line_number, i):
+            return lambda : self.slice_menu.handle_input(line_number, i)
         for line_number, line in enumerate(options):
             # display line
             if len(line) == 0:
@@ -361,7 +363,7 @@ class Master:
             for i, c in enumerate(line):
                 zone = create_simple_zone(
                     c,
-                    lambda : self.slice_menu.handle_input(line_number, i),
+                    create_lambda(line_number, i),
                     (x + zone_width, y + zone_height),
                     (zone_height, zone_width)
                 )
