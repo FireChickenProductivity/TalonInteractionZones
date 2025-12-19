@@ -338,10 +338,11 @@ class Master:
         self.update_slice_menu(options, action)
 
     def update_slice_menu(self, options: list[str], action):
-        self.slice_menu = SliceMenu(options, action, self.return_to_previous_zone())
+        self.slice_menu = SliceMenu(options, action, self.return_to_previous_zone)
         self.set_zone_override(SPECIAL_SWAP_NAME_PREFIX + SLICE_MENU_ZONE_NAME)
 
     def show_slice_menu(self):
+        self.showZones = True
         options = self.slice_menu.options
         left = self.zonesRect.left
         top = self.zonesRect.top
