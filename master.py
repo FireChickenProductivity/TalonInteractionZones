@@ -10,6 +10,7 @@ from .zones import SimpleZone, create_simple_zone
 from .keyboard import Keyboard, Key
 from .text_area import TextArea, draw_text_area
 from .zone_management import ZoneManager
+from .slice_menu import SliceMenu, insert_slice
 
 HOME_DIRECTORY = verify_home_dir()
 ZONE_SIZE = 200
@@ -29,7 +30,8 @@ class Master:
     __slots__ = (
         'displays', 'showZones', 'screen', 'screenRect', 'zonesRect', 'canvas', 'configs',
         'activeID', 'toggleRect', 'lastWindowTitle', 'activeZoneSet', 'overrideZoneSet', 'updateTriggered',
-        'keyboard', 'job', 'job2', 'zone_manager', 'previous_zone')
+        'keyboard', 'job', 'job2', 'zone_manager', 'previous_zone',
+        'slice_menu')
     def __init__(self) -> None:
         self.displays = {}
         self.showZones = False
@@ -59,6 +61,7 @@ class Master:
         self.updateTriggered=False
         self.keyboard: Keyboard = Keyboard(self.update_keyboard_current_text)
         self.keyboard.update_size(self.screen.width, self.screen.height//2)
+        self.slice_menu = None
 
     def set_zone_override(self,zoneSet):
         self.previous_zone = self.overrideZoneSet
@@ -303,6 +306,31 @@ class Master:
         )
         self.zone_manager.add_zone(keyboard_zone)
         self.showZones = True
+
+    def show_slice_menu(self, options: list[str], action):
+        self.slice_menu = SliceMenu(options, action, self.return_to_previous_zone())
+        left = self.zonesRect.left
+        top = self.zonesRect.top
+        height = self.zonesRect.height
+        width = self.zonesRect.width
+        y = top
+        delta_y = math.floor(height/len(options))
+        zone_height = round(delta_y/2)
+        for line_number, line in enumerate(options):
+            # display line
+            x = left
+            delta_x = math.floor(width/len(line))
+            zone_width = round(delta_x/2)
+            for i, c in enumerate(line):
+                zone = create_simple_zone(
+                    c,
+                    lambda : self.slice_menu.handle_input(line_number, i),
+                    (x + zone_width, y + zone_height),
+                    (zone_height, zone_width)
+                )
+                self.zone_manager.add_zone(zone)
+                x += delta_x
+            y += delta_y
 
     def show_file(self):
         optimal_name = self.get_optimal_file_name()
