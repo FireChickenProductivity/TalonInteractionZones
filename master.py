@@ -211,18 +211,25 @@ class Master:
                 corresponding_actions = [create_snippet_lambda(name) for name in matching_snippet_names]
                 self.add_temporary_keyboard_row(matching_snippet_names, corresponding_actions, row_number)
             word_completions = actions.user.interaction_zones_get_completions(text.lower(), 20)
+            def completion_action(completion):
+                original = text
+                extra = completion[len(original):]
+                actions.insert(extra)
+                self.keyboard.set_current_text(original + extra)
+            def create_completion_lambda(completion):
+                return lambda: completion_action(completion)
             if word_completions:
                 row_number += 1
-                def completion_action(completion):
-                    original = text
-                    extra = completion[len(original):]
-                    actions.insert(extra)
-                    self.keyboard.set_current_text(original + extra)
-                def create_completion_lambda(completion):
-                    return lambda: completion_action(completion)
                 corresponding_actions = [create_completion_lambda(c) for c in word_completions]
                 self.add_temporary_keyboard_row(word_completions, corresponding_actions, row_number)
-                
+            recent_inserts = actions.user.fire_chicken_interaction_zones_get_recent_inserts()
+            matching_inserts = [t for t in recent_inserts
+                            if t.startswith(text) and len(text) < len(t)]
+            if matching_inserts:
+                row_number += 1
+                corresponding_actions = [create_completion_lambda(c) for c in matching_inserts]
+                self.add_temporary_keyboard_row(matching_inserts, corresponding_actions, row_number)
+                    
                 
     def add_temporary_keyboard_row(self, names, corresponding_actions, row_number: int):
         """
