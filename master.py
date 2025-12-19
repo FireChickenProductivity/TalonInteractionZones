@@ -350,21 +350,27 @@ class Master:
         width = self.zonesRect.width
         y = top
         delta_y = math.floor(height/len(options))
-        zone_height = round(delta_y/2)
+        zone_height = round(delta_y*.8)
         def create_lambda(line_number, i):
             return lambda : self.slice_menu.handle_input(line_number, i)
         for line_number, line in enumerate(options):
             # display line
-            if len(line) == 0:
+            num_spaces = 0
+            for c in line:
+                if c.isspace():
+                    num_spaces += 1
+            if len(line) - num_spaces == 0:
                 continue
             x = left
-            delta_x = math.floor(width/len(line))
-            zone_width = round(delta_x/2)
+            delta_x = math.floor(width/(len(line) - num_spaces))
+            zone_width = round(delta_x*.8)
             for i, c in enumerate(line):
+                if c.isspace():
+                    continue
                 zone = create_simple_zone(
                     c,
                     create_lambda(line_number, i),
-                    (x + zone_width, y + zone_height),
+                    (x + round(zone_width/2), y + round(zone_height/2)),
                     (zone_height, zone_width)
                 )
                 self.zone_manager.add_zone(zone)
