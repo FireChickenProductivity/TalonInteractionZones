@@ -41,8 +41,8 @@ def compute_text(options, start, end) -> str:
 	relevant_lines.append(
 		options[first_line][first_index:]
 	)
-	for i in range(first_line+1, second_line):
-		relevant_lines.append(options[i])
+	if second_line - first_line > 1:
+		relevant_lines.extend(options[first_line+1:second_line])
 	relevant_lines.append(
 		options[second_line][:second_index+1]
 	)
