@@ -328,11 +328,13 @@ class Master:
         self.showZones = True
 
     def show_select_up_slice_menu(self, action):
-        options = actions.user.fire_chicken_interaction_zones_copy_up(SLICE_MENU_SELECTION_AMOUNT)
+        option_text = actions.user.fire_chicken_interaction_zones_copy_up(SLICE_MENU_SELECTION_AMOUNT)
+        options = option_text.split("\n")
         self.update_slice_menu(options, action)
 
     def show_select_down_slice_menu(self, action):
-        options = actions.user.fire_chicken_interaction_zones_copy_down(SLICE_MENU_SELECTION_AMOUNT)
+        option_text = actions.user.fire_chicken_interaction_zones_copy_down(SLICE_MENU_SELECTION_AMOUNT)
+        options = option_text.split("\n")
         self.update_slice_menu(options, action)
 
     def update_slice_menu(self, options: list[str], action):
@@ -350,6 +352,8 @@ class Master:
         zone_height = round(delta_y/2)
         for line_number, line in enumerate(options):
             # display line
+            if len(line) == 0:
+                continue
             x = left
             delta_x = math.floor(width/len(line))
             zone_width = round(delta_x/2)
