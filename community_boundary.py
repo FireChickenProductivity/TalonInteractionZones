@@ -20,3 +20,22 @@ class Actions:
 		for _ in range(n):
 			actions.edit.extend_down()
 		actions.edit.extend_line_end()
+
+	def fire_chicken_interaction_zones_copy_up(n: int) -> str:
+		"""Copy the following lines above the cursor"""
+		actions.user.fire_chicken_interaction_zones_select_up(n)
+		result = actions.user.fire_chicken_interaction_zones_get_selected_text()
+		actions.edit.right()
+		return result
+
+	def fire_chicken_interaction_zones_copy_down(n: int) -> str:
+		"""Copy the following lines below the cursor"""
+		actions.user.fire_chicken_interaction_zones_select_down(n)
+		result = actions.user.fire_chicken_interaction_zones_get_selected_text()
+		actions.edit.left()
+		return result
+
+	def fire_chicken_interaction_zones_paste(text: str):
+		"""Pastes the specified text"""
+		actions.user.paste(text)
+		

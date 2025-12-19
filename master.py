@@ -24,7 +24,8 @@ RECENT_INSERTS_ZONE_NAME = "RECENT_INSERT"
 RECENT_KEYSTROKES_ZONE_NAME = "RECENT_KEYSTROKE"
 KEYBOARD_ZONE_NAME = "KEYBOARD"
 EDIT_ACTIONS_ZONE_NAME = "EDIT"
-SPECIAL_ZONE_NAMES = set([SNIPPET_ZONE_NAME, OPERATOR_ZONE_NAME, RECENT_INSERTS_ZONE_NAME, RECENT_KEYSTROKES_ZONE_NAME, KEYBOARD_ZONE_NAME, EDIT_ACTIONS_ZONE_NAME])
+SLICE_MENU_ZONE_NAME = "SLICE_MENU"
+SPECIAL_ZONE_NAMES = set([SNIPPET_ZONE_NAME, OPERATOR_ZONE_NAME, RECENT_INSERTS_ZONE_NAME, RECENT_KEYSTROKES_ZONE_NAME, KEYBOARD_ZONE_NAME, EDIT_ACTIONS_ZONE_NAME, SLICE_MENU_ZONE_NAME])
 
 class Master:
     __slots__ = (
@@ -136,6 +137,8 @@ class Master:
             self.show_zone_for_list(names, corresponding_actions)
         elif name == KEYBOARD_ZONE_NAME:
             self.show_keyboard()
+        elif name == SLICE_MENU_ZONE_NAME:
+            self.show_slice_menu()
 
     def show_keyboard(self):
         def create_key_operator(key: Key):
@@ -175,7 +178,24 @@ class Master:
             )
             self.zone_manager.add_zone(zone)
             center_x += key_width*2
-        
+        slice_menu_zones = (
+            (True, insert_slice, "bring up"),
+            (False, insert_slice, "bring down"),
+        )
+        for is_up, target, name in slice_menu_zones:
+            if is_up:
+                action = lambda: self.show_select_up_slice_menu(target)
+            else:
+                action = lambda: self.show_select_down_slice_menu(target)
+            zone = create_simple_zone(
+                name,
+                action,
+                (center_x, center_y),
+                (key_height, key_width)
+            )
+            self.zone_manager.add_zone(zone)
+            center_x += key_width*2
+
         self.showZones = True
         self.zone_manager.add_text_area(TextArea(
             "",
@@ -307,8 +327,20 @@ class Master:
         self.zone_manager.add_zone(keyboard_zone)
         self.showZones = True
 
-    def show_slice_menu(self, options: list[str], action):
+    def show_select_up_slice_menu(self, action):
+        options = actions.user.fire_chicken_interaction_zones_copy_up(SLICE_MENU_SELECTION_AMOUNT)
+        self.update_slice_menu(options, action)
+
+    def show_select_down_slice_menu(self, action):
+        options = actions.user.fire_chicken_interaction_zones_copy_down(SLICE_MENU_SELECTION_AMOUNT)
+        self.update_slice_menu(options, action)
+
+    def update_slice_menu(self, options: list[str], action):
         self.slice_menu = SliceMenu(options, action, self.return_to_previous_zone())
+        self.set_zone_override(SPECIAL_SWAP_NAME_PREFIX + SLICE_MENU_ZONE_NAME)
+
+    def show_slice_menu(self):
+        options = self.slice_menu.options
         left = self.zonesRect.left
         top = self.zonesRect.top
         height = self.zonesRect.height

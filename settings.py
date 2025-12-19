@@ -32,3 +32,6 @@ SHOW_WINDOW_NAME = False
 # EX: For window "user - Visual Studio Code", the file name should probably contain Visual Studio Code.
 # If no matching file can be found for a window, the file with the above set DEFAULT_FILE_NAME will be used.
 EXPERIMENTAL_AUTO_ZONE_CHANGE = False
+
+# the amount to select up and down first slice menus
+SLICE_MENU_SELECTION_AMOUNT = 30

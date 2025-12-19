@@ -25,10 +25,11 @@ class SliceMenu:
 			start, end = sort_slice_positions(self._start, end)
 			self.action(self.options, start, end)
 			self._start = None
+			self.selection_finished_callback()
 
 def insert_slice(options, start, end):
 	text = compute_text(options, start, end)
-	actions.insert(text)
+	actions.user.fire_chicken_interaction_zones_paste(text)
 
 def compute_text(options, start, end) -> str:
 	first_line = start[0]
@@ -52,4 +53,3 @@ def sort_slice_positions(start, end):
 	if (start[0] > end[0]) or ((start[0] == end[0]) and (start[1] > end[1])):
 		return end, start
 	return start, end
-	
