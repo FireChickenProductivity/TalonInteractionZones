@@ -22,7 +22,8 @@ OPERATOR_ZONE_NAME = "OPERATOR"
 RECENT_INSERTS_ZONE_NAME = "RECENT_INSERT"
 RECENT_KEYSTROKES_ZONE_NAME = "RECENT_KEYSTROKE"
 KEYBOARD_ZONE_NAME = "KEYBOARD"
-SPECIAL_ZONE_NAMES = set([SNIPPET_ZONE_NAME, OPERATOR_ZONE_NAME, RECENT_INSERTS_ZONE_NAME, RECENT_KEYSTROKES_ZONE_NAME, KEYBOARD_ZONE_NAME])
+EDIT_ACTIONS_ZONE_NAME = "EDIT"
+SPECIAL_ZONE_NAMES = set([SNIPPET_ZONE_NAME, OPERATOR_ZONE_NAME, RECENT_INSERTS_ZONE_NAME, RECENT_KEYSTROKES_ZONE_NAME, KEYBOARD_ZONE_NAME, EDIT_ACTIONS_ZONE_NAME])
 
 class Master:
     __slots__ = (
@@ -125,6 +126,11 @@ class Master:
                 return lambda: insert_operator(operator_name)
             corresponding_actions = [create_lambda(operator_name) for operator_name in operator_names]
             self.show_zone_for_list(operator_names, corresponding_actions)
+        elif name == EDIT_ACTIONS_ZONE_NAME:
+            edit_actions = actions.user.interaction_zones_get_edit_actions()
+            names = [a[0] for a in edit_actions]
+            corresponding_actions = [a[1] for a in edit_actions]
+            self.show_zone_for_list(names, corresponding_actions)
         elif name == KEYBOARD_ZONE_NAME:
             self.show_keyboard()
 
@@ -155,6 +161,7 @@ class Master:
         swap_zones = (
             ("default", "default"),
             ("operator", ":OPERATOR"),
+            ("edit", ":EDIT"),
         )
         for name, target in swap_zones:
             zone = create_simple_zone(

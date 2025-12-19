@@ -1,6 +1,94 @@
-from talon import Module
+from talon import Module, actions
+
+from typing import Callable
 
 mod = Module()
+
+
+edit_actions = (
+	("copy", actions.edit.copy,),
+	("cut", actions.edit.cut,),
+	("delete", actions.edit.delete,),
+	("delete_all", actions.edit.delete_all,),
+	("delete_left", actions.edit.delete_left,),
+	("delete_line", actions.edit.delete_line,),
+	("delete_paragraph", actions.edit.delete_paragraph,),
+	("delete_right", actions.edit.delete_right,),
+	("delete_sentence", actions.edit.delete_sentence,),
+	("delete_word", actions.edit.delete_word,),
+	("down", actions.edit.down,),
+	("extend_down", actions.edit.extend_down,),
+	("extend_file_end", actions.edit.extend_file_end,),
+	("extend_file_start", actions.edit.extend_file_start,),
+	("extend_left", actions.edit.extend_left,),
+	("extend_line_down", actions.edit.extend_line_down,),
+	("extend_line_end", actions.edit.extend_line_end,),
+	("extend_line_start", actions.edit.extend_line_start,),
+	("extend_line_up", actions.edit.extend_line_up,),
+	("extend_page_down", actions.edit.extend_page_down,),
+	("extend_page_up", actions.edit.extend_page_up,),
+	("extend_paragraph_end", actions.edit.extend_paragraph_end,),
+	("extend_paragraph_next", actions.edit.extend_paragraph_next,),
+	("extend_paragraph_previous", actions.edit.extend_paragraph_previous,),
+	("extend_paragraph_start", actions.edit.extend_paragraph_start,),
+	("extend_right", actions.edit.extend_right,),
+	("extend_sentence_end", actions.edit.extend_sentence_end,),
+	("extend_sentence_next", actions.edit.extend_sentence_next,),
+	("extend_sentence_previous", actions.edit.extend_sentence_previous,),
+	("extend_sentence_start", actions.edit.extend_sentence_start,),
+	("extend_up", actions.edit.extend_up,),
+	("extend_word_left", actions.edit.extend_word_left,),
+	("extend_word_right", actions.edit.extend_word_right,),
+	("file_end", actions.edit.file_end,),
+	("file_start", actions.edit.file_start,),
+	("find_next", actions.edit.find_next,),
+	("find_previous", actions.edit.find_previous,),
+	("indent_less", actions.edit.indent_less,),
+	("indent_more", actions.edit.indent_more,),
+	("jump_column", actions.edit.jump_column,),
+	("jump_line", actions.edit.jump_line,),
+	("left", actions.edit.left,),
+	("line_clone", actions.edit.line_clone,),
+	("line_down", actions.edit.line_down,),
+	("line_end", actions.edit.line_end,),
+	("line_insert_down", actions.edit.line_insert_down,),
+	("line_insert_up", actions.edit.line_insert_up,),
+	("line_start", actions.edit.line_start,),
+	("line_swap_down", actions.edit.line_swap_down,),
+	("line_swap_up", actions.edit.line_swap_up,),
+	("line_up", actions.edit.line_up,),
+	("page_down", actions.edit.page_down,),
+	("page_up", actions.edit.page_up,),
+	("paragraph_end", actions.edit.paragraph_end,),
+	("paragraph_next", actions.edit.paragraph_next,),
+	("paragraph_previous", actions.edit.paragraph_previous,),
+	("paragraph_start", actions.edit.paragraph_start,),
+	("paste", actions.edit.paste,),
+	("paste_match_style", actions.edit.paste_match_style,),
+	("print", actions.edit.print,),
+	("redo", actions.edit.redo,),
+	("right", actions.edit.right,),
+	("save", actions.edit.save,),
+	("save_all", actions.edit.save_all,),
+	("select_all", actions.edit.select_all,),
+	("select_line", actions.edit.select_line,),
+	("select_none", actions.edit.select_none,),
+	("select_paragraph", actions.edit.select_paragraph,),
+	("select_sentence", actions.edit.select_sentence,),
+	("select_word", actions.edit.select_word,),
+	("selection_clone", actions.edit.selection_clone,),
+	("sentence_end", actions.edit.sentence_end,),
+	("sentence_next", actions.edit.sentence_next,),
+	("sentence_previous", actions.edit.sentence_previous,),
+	("sentence_start", actions.edit.sentence_start,),
+	("undo", actions.edit.undo,),
+	("up", actions.edit.up,),
+	("word_left", actions.edit.word_left,),
+	("word_right", actions.edit.word_right,),
+	("zoom_in", actions.edit.zoom_in,),
+	("zoom_out", actions.edit.zoom_out,),
+	("zoom_reset", actions.edit.zoom_reset,),
+)
 
 @mod.action_class
 class Actions:
@@ -53,3 +141,7 @@ class Actions:
 				"POINTER_INDIRECTION",
 				"POINTER_ADDRESS_OF",
 				"POINTER_STRUCTURE_DEREFERENCE",]
+
+	def interaction_zones_get_edit_actions() -> tuple[tuple[str, Callable]]:
+		"""Return a dictionary consisting of edit action names and the corresponding actions"""
+		return edit_actions
