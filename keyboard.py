@@ -35,8 +35,11 @@ class Keyboard:
 		self._held_modifiers = set()
 		self.rows = [
 			[Key("esc"), Key("f1"), Key("f2"), Key("f3"), Key("f4"), Key("f5"), Key("f6"), Key("f7"), Key("f8"), Key("f9"), Key("f10"), Key("f11"), Key("f12")],
-			[Key("`", "~"), Key("1", "!"), Key("2", "@"), Key("3", "#"), Key("4", "$"), Key("5", "%"), Key("6", "^"),
-			Key("7", "&"), Key("8", "*"), Key("9", "("), Key("0", ")"), Key("-", "_"), Key("+", "="), Key("backspace")
+			[Key("~"), Key("!"), Key("@"), Key("#"), Key("$"), Key("%"), Key("^"),
+			Key("&"), Key("*"), Key("("), Key(")"), Key("_"), Key("="), Key("{"), Key(":"), Key("\"")
+			],
+			[Key("`"), Key("1"), Key("2"), Key("3"), Key("4"), Key("5"), Key("6"),
+			Key("7"), Key("8"), Key("9"), Key("0"), Key("-"), Key("+"), Key("backspace")
 			],
 			[Key("tab")] + [create_letter_key(c) for c in "qwertyuiop"] + [Key("[", "{"), Key("]", "}"), Key("\\", "|")],
 			[create_letter_key(c) for c in "asdfghjkl"] + [Key(";", ":"), Key("'", '"'), Key("enter")],
