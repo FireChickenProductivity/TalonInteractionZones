@@ -37,15 +37,15 @@ def compute_text(options, start, end) -> str:
 	first_index = start[1]
 	second_index = end[1]
 	if first_line == second_line:
-		return options[first_line][first_index:second_index+1]
+		return "".join(options[first_line][first_index:second_index+1])
 	relevant_lines = []
 	relevant_lines.append(
-		options[first_line][first_index:]
+		"".join(options[first_line][first_index:])
 	)
 	if second_line - first_line > 1:
-		relevant_lines.extend(options[first_line+1:second_line])
+		relevant_lines.extend("".join(options[first_line+1:second_line]))
 	relevant_lines.append(
-		options[second_line][:second_index+1]
+		"".join(options[second_line][:second_index+1])
 	)
 	return "".join(relevant_lines)
 
@@ -53,3 +53,29 @@ def sort_slice_positions(start, end):
 	if (start[0] > end[0]) or ((start[0] == end[0]) and (start[1] > end[1])):
 		return end, start
 	return start, end
+
+def compute_slice_menu_tokens(line:str):
+	result = []
+	current_start = 0
+	current_end = 0
+	previous_category = None
+	for c in line:
+		category = compute_token_category(c)
+		if (previous_category is not None) and (previous_category != category):
+			result.append(line[current_start:current_end])
+			current_start = current_end
+		previous_category = category
+		current_end += 1
+	result.append(line[current_start:])
+	return result
+
+def compute_token_category(token: str):
+	if token.isspace():
+		return 0
+	elif token.isalpha():
+		return 1 if token.islower() else 2
+	elif token.isdigit():
+		return 3
+	else:
+		return 4
+

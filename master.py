@@ -10,7 +10,7 @@ from .zones import SimpleZone, create_simple_zone
 from .keyboard import Keyboard, Key
 from .text_area import TextArea, draw_text_area
 from .zone_management import ZoneManager
-from .slice_menu import SliceMenu, insert_slice
+from .slice_menu import SliceMenu, insert_slice, compute_slice_menu_tokens
 
 HOME_DIRECTORY = verify_home_dir()
 ZONE_SIZE = 200
@@ -338,7 +338,9 @@ class Master:
         self.update_slice_menu(options, action)
 
     def update_slice_menu(self, options: list[str], action):
-        self.slice_menu = SliceMenu(options, action, self.return_to_previous_zone)
+        tokens = [compute_slice_menu_tokens(option) for 
+                  option in options]
+        self.slice_menu = SliceMenu(tokens, action, self.return_to_previous_zone)
         self.set_zone_override(SPECIAL_SWAP_NAME_PREFIX + SLICE_MENU_ZONE_NAME)
 
     def show_slice_menu(self):
@@ -355,18 +357,14 @@ class Master:
             return lambda : self.slice_menu.handle_input(line_number, i)
         for line_number, line in enumerate(options):
             # display line
-            num_spaces = 0
-            for c in line:
-                if c.isspace():
-                    num_spaces += 1
-            if len(line) - num_spaces == 0:
+            if (len(line) == 0) or ((len(line) == 1) and (line[0].isspace())):
                 continue
             x = left
-            delta_x = math.floor(width/(len(line) - num_spaces))
+            delta_x = math.floor(width/(len(line)))
             zone_width = round(delta_x*.8)
             for i, c in enumerate(line):
                 if c.isspace():
-                    continue
+                    c = ""
                 zone = create_simple_zone(
                     c,
                     create_lambda(line_number, i),
