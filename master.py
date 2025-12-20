@@ -162,26 +162,35 @@ class Master:
                 x += key_width
             y += key_height
             x = self.keyboard.x
-        center_x = x + key_width // 2
-        center_y = y + key_height // 2
         swap_zones = (
             ("default", "default"),
             ("operator", ":OPERATOR"),
             ("edit", ":EDIT"),
         )
+        slice_menu_zones = (
+            (True, insert_slice, "bring up"),
+            (False, insert_slice, "bring down"),
+        )
+        common_programing_actions = (
+            ("assign", lambda: actions.user.code_operator("ASSIGNMENT")),
+            ("slap", lambda: actions.edit.line_insert_down()),
+            ("comma space", lambda: actions.insert(", ")),
+            ("tail", lambda: actions.edit.line_end()),
+        )
+        special_row_length = len(swap_zones) + len(slice_menu_zones) + len(common_programing_actions)
+        special_row_width = round(self.keyboard.get_width()/special_row_length)
+        special_row_dimensions = (key_height, round(special_row_width*scaling_factor))
+        center_x = x + special_row_width // 2
+        center_y = y + key_height // 2
         for name, target in swap_zones:
             zone = create_simple_zone(
                 "swap " + name,
                 "swap: " + target,
                 (center_x, center_y),
-                (key_height, key_width)
+                special_row_dimensions
             )
             self.zone_manager.add_zone(zone)
-            center_x += key_width*2
-        slice_menu_zones = (
-            (True, insert_slice, "bring up"),
-            (False, insert_slice, "bring down"),
-        )
+            center_x += special_row_width
         for is_up, target, name in slice_menu_zones:
             if is_up:
                 action = lambda: self.show_select_up_slice_menu(target)
@@ -191,11 +200,19 @@ class Master:
                 name,
                 action,
                 (center_x, center_y),
-                (key_height, key_width)
+                special_row_dimensions
             )
             self.zone_manager.add_zone(zone)
-            center_x += key_width*2
-
+            center_x += special_row_width
+        for name, action in common_programing_actions:
+            zone = create_simple_zone(
+                name,
+                action,
+                (center_x, center_y),
+                special_row_dimensions
+            )
+            self.zone_manager.add_zone(zone)
+            center_x += special_row_width
         self.showZones = True
         self.zone_manager.add_text_area(TextArea(
             "",
