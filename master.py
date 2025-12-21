@@ -452,6 +452,8 @@ class Master:
         names: list,
         actions: list,
         is_temporary: bool=False):
+        if not names:
+            return 
         height = round((bottom - top)/(len(names)))
         center_y = top + round(height/2)
         scaling_factor = 0.5
