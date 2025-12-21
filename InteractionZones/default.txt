@@ -1,8 +1,3 @@
-#7aacddff|(1744, 101)
-programming
-on hover 1 1
-language
-
 #7aacddff|(144, 101)
 keyboard
 on hover 1 1

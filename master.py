@@ -428,7 +428,7 @@ class Master:
     def show_snippet_column(self):
         width = 100
         x = self.screenRect.right - round(width/2)
-        active_snippets = compute_active_snippet_names()
+        active_snippets = compute_active_priority_snippet_names()
         def snippet_action(name: str):
             actions.user.insert_snippet_by_name(name)
         def create_snippet_lambda(name: str):
@@ -454,8 +454,9 @@ class Master:
         is_temporary: bool=False):
         height = round((bottom - top)/(len(names)))
         center_y = top + round(height/2)
+        scaling_factor = 0.5
         for i in range(len(names)):
-            dimensions = (height, width)
+            dimensions = (round(scaling_factor*height), width)
             position = (center_x, center_y)
             name = names[i]
             action = actions[i]
@@ -672,6 +673,18 @@ def compute_active_snippet_names() -> list[str]:
         try:
             snippet = actions.user.get_snippet(snippet_name)
             if snippet:
+                relevant_snippet_names.append(snippet_name)
+        except Exception:
+            pass
+    relevant_snippet_names = sorted(relevant_snippet_names)
+    return relevant_snippet_names
+
+def compute_active_priority_snippet_names() -> list[str]:
+    priority_snippet_names = ["ifStatement", "returnStatement", "forLoopStatement", "forEachStatement", "whileLoopStatement", "switchStatement", "caseStatement", "breakStatement", "continueStatement"]
+    relevant_snippet_names = []
+    for snippet_name in priority_snippet_names:
+        try:
+            if actions.user.get_snippet(snippet_name):
                 relevant_snippet_names.append(snippet_name)
         except Exception:
             pass
