@@ -414,13 +414,63 @@ class Master:
                             print("Failed to parse zone with config\n%s"%ss)
             
             self.activeZoneSet = optimal_name
-            
+            if self.activeZoneSet == DEFAULT_FILE_NAME:
+                self.show_snippet_column()
             print("Passed config parsing stage with %s"%self.activeZoneSet)
             self.showZones = True
         except FileNotFoundError:
             print("Either configuration file txt or image png not found (%s)."%s)
             return
 
+        if self.activeZoneSet == DEFAULT_FILE_NAME:
+            self.show_snippet_column()
+
+    def show_snippet_column(self):
+        width = 100
+        x = self.screenRect.right - round(width/2)
+        active_snippets = compute_active_snippet_names()
+        def snippet_action(name: str):
+            actions.user.insert_snippet_by_name(name)
+        def create_snippet_lambda(name: str):
+            return lambda: snippet_action(name)
+        snippet_actions = [create_snippet_lambda(name) for name in active_snippets ]
+        self.show_column(
+            x,
+            width,
+            self.screenRect.top + 50,
+            self.screenRect.top + self.screenRect.height,
+            active_snippets,
+            snippet_actions
+        )
+    
+    def show_column(
+        self,
+        center_x: int,
+        width: int,
+        top: int,
+        bottom: int,
+        names: list,
+        actions: list,
+        is_temporary: bool=False):
+        height = round((bottom - top)/(len(names)))
+        center_y = top + round(height/2)
+        for i in range(len(names)):
+            dimensions = (height, width)
+            position = (center_x, center_y)
+            name = names[i]
+            action = actions[i]
+            zone = create_simple_zone(
+                name,
+                action,
+                position,
+                dimensions
+            )
+            center_y += height
+            if is_temporary:
+                self.zone_manager.add_temporary_zone(zone)
+            else:
+                self.zone_manager.add_zone(zone)
+            
     def disable(self) -> None:        
         self.canvas.unregister("draw", self.draw) 
         self.canvas.unregister("mouse", self.on_mouse)
