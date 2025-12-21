@@ -562,6 +562,10 @@ def primative_interaction(action:Union[Callable, str]):
         if action[:5]=="bind:":
             actions.user.keybinder_add_key_bind(action[6:].replace('\n',''))
             pass
+        elif action.startswith("action: "):
+            action_name = action[8:]
+            action_function = getattr(actions, action_name)
+            action_function()
         elif action[:7]=="unbind:":
             actions.user.keybinder_remove_key_bind(action[8:].replace('\n',''))
         elif action[:5]=="swap:":

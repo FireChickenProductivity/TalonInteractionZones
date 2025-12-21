@@ -37,3 +37,23 @@ pagedown
 page up
 on hover 1 1
 pageup
+
+#7aacddff|(750, 1000)
+slap
+on hover 1 1
+action: edit.line_insert_down
+
+#7aacddff|(650, 1000)
+assign
+on hover 1 1
+ = 
+
+#7aacddff|(550, 1000)
+backspace
+on hover 1 1
+backspace
+
+#7aacddff|(450, 1000)
+tab
+on hover 1 1
+tab
