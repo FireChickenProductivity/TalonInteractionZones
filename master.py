@@ -1,4 +1,4 @@
-from talon import ui, canvas, cron, ctrl, actions
+from talon import ui, canvas, cron, ctrl, actions, Module
 from talon.skia import Rect
 import os
 import math
@@ -424,6 +424,7 @@ class Master:
 
         if self.activeZoneSet == DEFAULT_FILE_NAME:
             self.show_snippet_column()
+            self.show_recent_insert_column()
 
     def show_snippet_column(self):
         width = 100
@@ -441,6 +442,29 @@ class Master:
             self.screenRect.top + self.screenRect.height,
             active_snippets,
             snippet_actions
+        )
+
+    def handle_insert(self):
+        """Update interface in response to inserted text"""
+        if self.activeZoneSet == DEFAULT_FILE_NAME:
+            self.show_recent_insert_column()
+
+    def show_recent_insert_column(self):
+        self.zone_manager.remove_temporary_zones()
+        recent_inserts = actions.user.fire_chicken_interaction_zones_get_n_recent_inserts(20)
+        def create_insert_lambda(text: str):
+            return lambda: actions.insert(text)
+        insert_actions = [create_insert_lambda(text) for text in recent_inserts]
+        width = 100
+        x = self.screenRect.left + round(width/2)
+        self.show_column(
+            x,
+            width,
+            self.screenRect.top + 100,
+            self.screenRect.top + self.screenRect.height,
+            recent_inserts,
+            insert_actions,
+            is_temporary=True
         )
     
     def show_column(
@@ -692,3 +716,10 @@ def compute_active_priority_snippet_names() -> list[str]:
             pass
     relevant_snippet_names = sorted(relevant_snippet_names)
     return relevant_snippet_names
+
+mod = Module()
+@mod.action_class
+class Actions:
+    def fire_chicken_interaction_zones_handle_insert():
+        """Have interaction zone user interface handle insert action"""
+        master.handle_insert()
