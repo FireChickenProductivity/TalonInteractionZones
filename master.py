@@ -245,6 +245,7 @@ class Master:
                 def snippet_action(name: str):
                     for _ in range(len(text)):
                         actions.edit.delete()
+                    self.keyboard.update_current_text("")
                     actions.user.insert_snippet_by_name(name)
                 def create_snippet_lambda(name):
                     return lambda: snippet_action(name)
