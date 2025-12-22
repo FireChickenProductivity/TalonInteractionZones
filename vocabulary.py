@@ -12,12 +12,17 @@ def load_prefix_information_from_file(path: str) -> Trie:
 	return trie
 
 class Vocabulary:
-	__slots__ = ('big_vocabulary')
+	__slots__ = ('big_vocabulary', 'personal_vocabulary')
 
 	def __init__(self):
 		current_directory = os.path.dirname(__file__)
 		big_vocabulary_path = os.path.join(current_directory, "big_vocabulary.txt")
 		self.big_vocabulary = load_prefix_information_from_file(big_vocabulary_path)
+		personal_vocabulary_path = os.path.join(current_directory, "personal_vocabulary.txt")
+		if os.path.exists(personal_vocabulary_path):
+			self.personal_vocabulary = load_prefix_information_from_file(personal_vocabulary_path)
+		else:
+			self.personal_vocabulary = None
 
 	def get_completions_for(self, text: str, limit: int):
 		return self.big_vocabulary.get_possibilities(

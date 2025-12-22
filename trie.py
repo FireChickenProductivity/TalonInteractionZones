@@ -5,16 +5,24 @@ class Trie:
 		self.char = char
 		self.children = {}
 
-	def add_child(self, char):
-		if char not in self.children:
-			self.children[char] = Trie(char)
+	def add_child(self, char, metadata, combiner):
+		if metadata and char in self.children:
+			self.children[char][1] = combiner(
+				self.children[char][1],
+				metadata
+			)
+		elif char not in self.children:
+			if metadata:
+				self.children[char] = (Trie(char), metadata)
+			else:
+				self.children[char] = Trie(char)
 		return self.children[char]
 
-	def add_text(self, text):
+	def add_text(self, text, metadata=None, combiner=None):
 		trie = self
 		for c in text:
-			trie = trie.add_child(c)
-		trie.add_child("")
+			trie = trie.add_child(c, None, None)
+		trie.add_child("", metadata, combiner)
 
 	def get_possibilities(self, prefix: str, limit: int):
 		"""
@@ -33,11 +41,18 @@ class Trie:
 		while current_level:
 			for child, current_prefix in current_level:
 				for nested_child in child.children.values():
+					if isinstance(nested_child, Trie):
+						metadata = None
+					else:
+						nested_child, metadata = nested_child
 					nested_character = nested_child.char
 					total = current_prefix + nested_character
 					if nested_character == "":
 						if len(total) > len(prefix) + 1:
-							results.append(total)
+							if metadata:
+								results.append((total, metadata))
+							else:
+								results.append(total)
 						if len(results) >= limit:
 							return results
 					else:
@@ -99,3 +114,21 @@ if __name__ == '__main__':
 	)
 	for test_case in test_cases:
 		test_recreates_source(*test_case)
+	def test_word_counts(counts):
+		trie = Trie("")
+		for word in counts:
+			count = counts[word]
+			trie.add_text(word, count, lambda a, b: a+b)
+		results = trie.get_possibilities("", len(counts))
+		for result in results:
+			word, count = result
+			if word not in counts:
+				print(f"Incorrect new word {word}")
+			elif counts[word] != count:
+				print(f"Word {word} had wrong count {count}")
+		result_words = [result[0] for result in results]
+		for word in counts:
+			if word not in result_words:
+				print(f"Results were missing word {word}")
+
+	test_word_counts({"chicken": 2, "word": 1, "more": 30})
