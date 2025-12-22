@@ -1,4 +1,4 @@
-from talon import ui, canvas, cron, ctrl, actions, Module
+from talon import ui, canvas, cron, ctrl, actions, Module, settings
 from talon.skia import Rect
 import os
 import math
@@ -32,7 +32,7 @@ class Master:
         'displays', 'showZones', 'screen', 'screenRect', 'zonesRect', 'canvas', 'configs',
         'activeID', 'toggleRect', 'lastWindowTitle', 'activeZoneSet', 'overrideZoneSet', 'updateTriggered',
         'keyboard', 'job', 'job2', 'zone_manager', 'previous_zone',
-        'slice_menu')
+        'slice_menu', 'num_keyboard_interactions')
     def __init__(self) -> None:
         self.displays = {}
         self.showZones = False
@@ -62,6 +62,7 @@ class Master:
         self.updateTriggered=False
         self.keyboard: Keyboard = Keyboard(self.update_keyboard_current_text)
         self.keyboard.update_size(self.screen.width, self.screen.height//2)
+        self.num_keyboard_interactions = 0
         self.slice_menu = None
 
     def set_zone_override(self,zoneSet):
@@ -144,7 +145,7 @@ class Master:
 
     def show_keyboard(self):
         def create_key_operator(key: Key):
-            return lambda: self.keyboard.handle_keypress(key)
+            return lambda: self.handle_keypress(key)
                 
         x = self.keyboard.x
         y = self.keyboard.y
@@ -225,6 +226,14 @@ class Master:
             rgba2hex(255,255,255,ZONES_TEXT_ALPHA),
             "#7aacddff",
         ))
+
+    def handle_keypress(self, key):
+        self.keyboard.handle_keypress(key)
+        self.num_keyboard_interactions += 1
+        print('self.num_keyboard_interactions', self.num_keyboard_interactions)
+        if self.num_keyboard_interactions >= settings.get("user.fire_chicken_interaction_zones_personal_vocabulary_saving_period"):
+            actions.user.interaction_zones_save_vocabulary()
+            self.num_keyboard_interactions = 0
 
     def update_keyboard_current_text(self, text: str, previous: str):
         """text: the current keyboard text
@@ -721,6 +730,13 @@ def compute_active_priority_snippet_names() -> list[str]:
     return relevant_snippet_names
 
 mod = Module()
+
+mod.setting(
+    "fire_chicken_interaction_zones_personal_vocabulary_saving_period",
+    type=int,
+    default=100,
+    desc="Save the fire chicken interaction zones personal vocabulary if it has changed every time this number of keyboard interactions occurs"
+)
 @mod.action_class
 class Actions:
     def fire_chicken_interaction_zones_handle_insert():
