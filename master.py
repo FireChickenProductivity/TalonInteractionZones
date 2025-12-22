@@ -11,6 +11,7 @@ from .keyboard import Keyboard, Key
 from .text_area import TextArea, draw_text_area
 from .zone_management import ZoneManager
 from .slice_menu import SliceMenu, insert_slice, compute_slice_menu_tokens
+from .string_utilities import compute_last_word
 
 HOME_DIRECTORY = verify_home_dir()
 ZONE_SIZE = 200
@@ -244,17 +245,18 @@ class Master:
         self.zone_manager.update_text_area_text(0, text)
         self.zone_manager.remove_temporary_zones()
         row_number: int = 0
-        if text:
+        last_word = compute_last_word(text)
+        if last_word:
             snippet_names = compute_active_snippet_names()
             matching_snippet_names = [
                 name for name in snippet_names
-                if name.startswith(text)
+                if name.startswith(last_word)
             ]
             
             if matching_snippet_names:
                 row_number += 1
                 def snippet_action(name: str):
-                    for _ in range(len(text)):
+                    for _ in range(len(last_word)):
                         actions.edit.delete()
                     self.keyboard.update_current_text("")
                     actions.user.insert_snippet_by_name(name)
@@ -262,9 +264,9 @@ class Master:
                     return lambda: snippet_action(name)
                 corresponding_actions = [create_snippet_lambda(name) for name in matching_snippet_names]
                 self.add_temporary_keyboard_row(matching_snippet_names, corresponding_actions, row_number)
-            word_completions = actions.user.interaction_zones_get_completions(text.lower(), 20)
+            word_completions = actions.user.interaction_zones_get_completions(last_word.lower(), 20)
             def completion_action(completion):
-                original = text
+                original = last_word
                 extra = completion[len(original):]
                 actions.insert(extra)
                 self.keyboard.set_current_text(original + extra)
@@ -276,13 +278,12 @@ class Master:
                 self.add_temporary_keyboard_row(word_completions, corresponding_actions, row_number)
             recent_inserts = actions.user.fire_chicken_interaction_zones_get_recent_inserts()
             matching_inserts = [t for t in recent_inserts
-                            if t.startswith(text) and len(text) < len(t)]
+                            if t.startswith(last_word) and len(last_word) < len(t)]
             if matching_inserts:
                 row_number += 1
                 corresponding_actions = [create_completion_lambda(c) for c in matching_inserts]
                 self.add_temporary_keyboard_row(matching_inserts, corresponding_actions, row_number)
                     
-                
     def add_temporary_keyboard_row(self, names, corresponding_actions, row_number: int):
         """
             Add a row at the bottom of the keyboard with
