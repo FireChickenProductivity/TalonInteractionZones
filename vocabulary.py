@@ -75,6 +75,7 @@ class Vocabulary:
 
 	def handle_word_used_by_user(self, word: str):
 		"""Update personal vocabulary in response to a word used by the user"""
+		self.personal_vocabulary_changed = True
 		lower = word.lower()
 		was_present = self.personal_vocabulary.contains(lower)
 		self.personal_vocabulary.add_text(lower, 1, add_numbers)
