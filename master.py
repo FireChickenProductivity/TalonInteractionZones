@@ -230,6 +230,7 @@ class Master:
         """
         if (text == "") and (previous != "") and (len(previous) > 2):
             actions.user.fire_chicken_interaction_zones_add_recent_insert(previous)
+            actions.user.interaction_zones_handle_word_used_by_user(previous)
         self.zone_manager.update_text_area_text(0, text)
         self.zone_manager.remove_temporary_zones()
         row_number: int = 0

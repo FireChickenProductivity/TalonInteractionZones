@@ -47,10 +47,26 @@ class Vocabulary:
 
 	def get_completions_for(self, text: str, limit: int):
 		"""Offer at most limit word completion options for the text given"""
-		return self.big_vocabulary.get_possibilities(
+		personalized_options = self.personal_vocabulary.get_possibilities(
 			text.lower(),
-			limit
+			1000
 		)
+		
+		# pick best limit personalized options
+		if len(personalized_options) <= limit:
+			options = personalized_options
+		else:
+			options = sorted(personalized_options, key=lambda x: x[1])[:limit]
+		options = sorted([option[0] for option in options])
+		if len(options) < limit:
+			big_options = self.big_vocabulary.get_possibilities(
+				text.lower(),
+				limit - len(options)
+			)
+			options.extend(big_options)
+		return options
+
+
 
 	def handle_word_used_by_user(self, word: str):
 		"""Update personal vocabulary in response to a word used by the user"""
