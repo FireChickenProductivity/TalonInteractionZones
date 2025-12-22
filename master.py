@@ -67,6 +67,8 @@ class Master:
     def set_zone_override(self,zoneSet):
         self.previous_zone = self.overrideZoneSet
         self.overrideZoneSet=zoneSet
+        if self.keyboard.current_text:
+            self.keyboard.set_current_text("")
         self.updateTriggered = True
 
     def return_to_previous_zone(self):
