@@ -230,7 +230,6 @@ class Master:
     def handle_keypress(self, key):
         self.keyboard.handle_keypress(key)
         self.num_keyboard_interactions += 1
-        print('self.num_keyboard_interactions', self.num_keyboard_interactions)
         if self.num_keyboard_interactions >= settings.get("user.fire_chicken_interaction_zones_personal_vocabulary_saving_period"):
             actions.user.interaction_zones_save_vocabulary()
             self.num_keyboard_interactions = 0

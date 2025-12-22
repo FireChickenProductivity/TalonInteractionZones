@@ -66,7 +66,8 @@ class Vocabulary:
 		if len(options) < limit:
 			big_options = self.big_vocabulary.get_possibilities(
 				text.lower(),
-				limit - len(options)
+				limit - len(options),
+				to_ignore=set(options)
 			)
 			options.extend(big_options)
 		return options

@@ -26,7 +26,7 @@ class Trie:
 			trie = trie.add_child(c, None, None)
 		trie.add_child("", metadata, combiner)
 
-	def get_possibilities(self, prefix: str, limit: int):
+	def get_possibilities(self, prefix: str, limit: int, *, to_ignore=None):
 		"""
 			Find limit items with the specified prefix
 			Ignore character at the current level. This is empty for the head.
@@ -50,7 +50,7 @@ class Trie:
 					nested_character = nested_child.char
 					total = current_prefix + nested_character
 					if nested_character == "":
-						if len(total) > len(prefix) + 1:
+						if (len(total) > len(prefix) + 1) and (to_ignore is None or total not in to_ignore):
 							if metadata:
 								results.append((total, metadata))
 							else:
