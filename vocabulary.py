@@ -1,7 +1,7 @@
 from .trie import Trie
 import os
 
-from talon import app, Module
+from talon import app, Module, settings
 
 def load_prefix_information_from_file(path: str) -> Trie:
 	trie = Trie("")
@@ -54,7 +54,7 @@ class Vocabulary:
 		"""Offer at most limit word completion options for the text given"""
 		personalized_options = self.personal_vocabulary.get_possibilities(
 			text.lower(),
-			1000
+			settings.get("user.fire_chicken_interaction_zones_number_of_personal_words_to_consider")
 		)
 		
 		# pick best limit personalized options
@@ -70,8 +70,6 @@ class Vocabulary:
 			)
 			options.extend(big_options)
 		return options
-
-
 
 	def handle_word_used_by_user(self, word: str):
 		"""Update personal vocabulary in response to a word used by the user"""
@@ -97,6 +95,14 @@ def on_ready():
 app.register("ready", on_ready)
 
 mod = Module()
+
+mod.setting(
+	"fire_chicken_interaction_zones_number_of_personal_words_to_consider",
+	type=int,
+	default=1000,
+	desc="The maximum number of words from the personal vocabulary to consider during fire chicken interaction zones word completions"
+)
+
 @mod.action_class
 class Actions:
 	def interaction_zones_get_completions(text: str, limit: int=20) -> list[str]:
