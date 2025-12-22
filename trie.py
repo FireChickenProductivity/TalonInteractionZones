@@ -55,7 +55,7 @@ class Trie:
 								results.append((total, metadata))
 							else:
 								results.append(total)
-						if len(results) >= limit:
+						if len(results) >= limit and limit > 0:
 							return results
 					else:
 						next_level.append((nested_child, total))

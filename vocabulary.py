@@ -11,6 +11,23 @@ def load_prefix_information_from_file(path: str) -> Trie:
 			trie.add_text(line.strip().lower())
 	return trie
 
+def save_word_count_trie(path: str, trie: Trie):
+	words_with_metadata = trie.get_possibilities("", 0)
+	with open(path, "w") as f:
+		for result in words_with_metadata:
+			word, count = result
+			f.write(f"{word},{count}\n")
+
+def load_word_count_trie(path: str):
+	trie = Trie("")
+	with open(path, "r") as f:
+		lines: list[str] = f.readlines()
+		for line in lines:
+			word, count = line.split(",")
+			count = int(count)
+			trie.add_text(word, count, lambda a, b: a+b)
+	return trie
+
 class Vocabulary:
 	__slots__ = ('big_vocabulary', 'personal_vocabulary')
 
