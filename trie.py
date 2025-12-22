@@ -63,6 +63,16 @@ class Trie:
 			next_level = []
 		return results
 
+	def contains(self, word: str):
+		trie = self
+		for c in word:
+			if c in trie.children:
+				trie = trie.children[c]
+			else:
+				return False
+		if "" in trie.children:
+			return True
+
 	def compute_child_matching_prefix(self, prefix: str):
 		trie = self
 		for c in prefix:
@@ -146,3 +156,13 @@ if __name__ == '__main__':
 		print('results', new_results)
 
 	test_word_counts({"chicken": 2, "word": 1, "more": 30}, "more")
+
+	def test_contains(source, absent):
+		trie = create_from_iterable((source))
+		for word in source:
+			if not trie.contains(word):
+				print(f"Contains test failure, missing {word}")
+		for word in absent:
+			if trie.contains(word):
+				print(f"Contains test failure, mistakenly had {word}")
+	test_contains(["apple", "app", "back", "backs"], ["a", "b", "pizza", "ap", "appl"])
