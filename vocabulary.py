@@ -18,6 +18,9 @@ def save_word_count_trie(path: str, trie: Trie):
 			word, count = result
 			f.write(f"{word},{count}\n")
 
+def add_numbers(a, b):
+	return a+b
+
 def load_word_count_trie(path: str):
 	trie = Trie("")
 	with open(path, "r") as f:
@@ -25,27 +28,33 @@ def load_word_count_trie(path: str):
 		for line in lines:
 			word, count = line.split(",")
 			count = int(count)
-			trie.add_text(word, count, lambda a, b: a+b)
+			trie.add_text(word, count, add_numbers)
 	return trie
 
 class Vocabulary:
-	__slots__ = ('big_vocabulary', 'personal_vocabulary')
+	__slots__ = ('big_vocabulary', 'personal_vocabulary', 'personal_vocabulary_path')
 
 	def __init__(self):
 		current_directory = os.path.dirname(__file__)
 		big_vocabulary_path = os.path.join(current_directory, "big_vocabulary.txt")
 		self.big_vocabulary = load_prefix_information_from_file(big_vocabulary_path)
-		personal_vocabulary_path = os.path.join(current_directory, "personal_vocabulary.txt")
-		if os.path.exists(personal_vocabulary_path):
-			self.personal_vocabulary = load_prefix_information_from_file(personal_vocabulary_path)
+		self.personal_vocabulary_path = os.path.join(current_directory, "personal_vocabulary.txt")
+		if os.path.exists(self.personal_vocabulary_path):
+			self.personal_vocabulary = load_word_count_trie(self.personal_vocabulary_path)
 		else:
-			self.personal_vocabulary = None
+			self.personal_vocabulary = Trie("")
 
 	def get_completions_for(self, text: str, limit: int):
 		return self.big_vocabulary.get_possibilities(
 			text.lower(),
 			limit
 		)
+
+	def handle_word_used_by_user(self, word: str):
+		self.personal_vocabulary.add_text(word.lower(), 1, add_numbers)
+
+	def save_personal_vocabulary(self):
+		save_word_count_trie(self.personal_vocabulary_path, self.personal_vocabulary)
 
 vocabulary: Vocabulary
 
