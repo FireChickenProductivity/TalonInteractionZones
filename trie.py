@@ -7,10 +7,12 @@ class Trie:
 
 	def add_child(self, char, metadata, combiner):
 		if metadata and char in self.children:
-			self.children[char][1] = combiner(
-				self.children[char][1],
+			node, previousMetadata = self.children[char]
+			new_metadata = combiner(
+				previousMetadata,
 				metadata
 			)
+			self.children[char] = (node, new_metadata)
 		elif char not in self.children:
 			if metadata:
 				self.children[char] = (Trie(char), metadata)
@@ -114,7 +116,7 @@ if __name__ == '__main__':
 	)
 	for test_case in test_cases:
 		test_recreates_source(*test_case)
-	def test_word_counts(counts):
+	def test_word_counts(counts, extra_word):
 		trie = Trie("")
 		for word in counts:
 			count = counts[word]
@@ -130,5 +132,17 @@ if __name__ == '__main__':
 		for word in counts:
 			if word not in result_words:
 				print(f"Results were missing word {word}")
+		trie.add_text(extra_word, 1, lambda a, b: a+b)
+		new_results = trie.get_possibilities("", len(counts))
+		extra_result = None
+		for result in new_results:
+			word, count = result
+			if word == extra_word:
+				extra_result = count
+				break
+		if extra_result != counts[extra_word]+1:
+			print(f"Extra word {extra_word} had wrong count {extra_result}")
+			
+		print('results', new_results)
 
-	test_word_counts({"chicken": 2, "word": 1, "more": 30})
+	test_word_counts({"chicken": 2, "word": 1, "more": 30}, "more")
