@@ -208,10 +208,18 @@ class Master:
             )
             self.zone_manager.add_zone(zone)
             center_x += special_row_width
+
+        def perform_action_with_text_reset(action):
+            action()
+            self.keyboard.set_current_text("")
+            
+        def create_action_with_text_reset(action):
+            return lambda: perform_action_with_text_reset(action)
         for name, action in common_programing_actions:
+            
             zone = create_simple_zone(
                 name,
-                action,
+                create_action_with_text_reset(action),
                 (center_x, center_y),
                 special_row_dimensions
             )
