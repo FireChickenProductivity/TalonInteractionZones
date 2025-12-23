@@ -11,7 +11,7 @@ from .keyboard import Keyboard, Key
 from .text_area import TextArea, draw_text_area
 from .zone_management import ZoneManager
 from .slice_menu import SliceMenu, insert_slice, compute_slice_menu_tokens
-from .string_utilities import compute_last_word
+from .string_utilities import compute_last_word, compute_words
 
 HOME_DIRECTORY = verify_home_dir()
 ZONE_SIZE = 200
@@ -241,7 +241,10 @@ class Master:
         """
         if (text == "") and (previous != "") and (len(previous) > 2):
             actions.user.fire_chicken_interaction_zones_add_recent_insert(previous)
-            actions.user.interaction_zones_handle_word_used_by_user(previous)
+            words = compute_words(previous)
+            for word in words:
+                if len(word) > 2:
+                    actions.user.interaction_zones_handle_word_used_by_user(word)
         self.zone_manager.update_text_area_text(0, text)
         self.zone_manager.remove_temporary_zones()
         row_number: int = 0
@@ -266,10 +269,9 @@ class Master:
                 self.add_temporary_keyboard_row(matching_snippet_names, corresponding_actions, row_number)
             word_completions = actions.user.interaction_zones_get_completions(last_word.lower(), 20)
             def completion_action(completion):
-                original = last_word
-                extra = completion[len(original):]
+                extra = completion[len(last_word):]
                 actions.insert(extra)
-                self.keyboard.set_current_text(original + extra)
+                self.keyboard.set_current_text(text + extra)
             def create_completion_lambda(completion):
                 return lambda: completion_action(completion)
             if word_completions:

@@ -75,7 +75,7 @@ class Keyboard:
 	def update_current_text(self, keystroke):
 		"""Keep track of consecutively dictated letters"""
 		previous = self.current_text
-		if keystroke.isalpha() and len(keystroke) == 1:
+		if (keystroke.isalpha() or keystroke == "_") and len(keystroke) == 1:
 			self.current_text += keystroke
 		elif len(self.current_text) > 0 and keystroke == "backspace":
 			new_text_end = len(self.current_text)-1
