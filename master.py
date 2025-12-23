@@ -215,8 +215,8 @@ class Master:
             
         def create_action_with_text_reset(action):
             return lambda: perform_action_with_text_reset(action)
+
         for name, action in common_programing_actions:
-            
             zone = create_simple_zone(
                 name,
                 create_action_with_text_reset(action),
