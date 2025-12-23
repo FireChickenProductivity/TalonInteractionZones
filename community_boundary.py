@@ -13,12 +13,14 @@ class Actions:
 		for _ in range(n):
 			actions.edit.extend_up()
 		actions.edit.extend_line_start()
+		actions.edit.extend_line_start()
 
 	def fire_chicken_interaction_zones_select_down(n: int):
 		"""Selects the specified number of lines down"""
 		actions.edit.extend_line_end()
 		for _ in range(n):
 			actions.edit.extend_down()
+		actions.edit.extend_line_end()
 		actions.edit.extend_line_end()
 
 	def fire_chicken_interaction_zones_copy_up(n: int) -> str:

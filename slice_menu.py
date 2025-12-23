@@ -41,13 +41,14 @@ def compute_text(options, start, end) -> str:
 	relevant_lines = []
 	relevant_lines.append(
 		"".join(options[first_line][first_index:])
-	)
+ 	)
 	if second_line - first_line > 1:
-		relevant_lines.extend("".join(options[first_line+1:second_line]))
+		relevant_lists = options[first_line+1:second_line]
+		relevant_lines.extend(["".join(line) for line in relevant_lists])
 	relevant_lines.append(
 		"".join(options[second_line][:second_index+1])
 	)
-	return "".join(relevant_lines)
+	return "\n".join(relevant_lines)
 
 def sort_slice_positions(start, end):
 	if (start[0] > end[0]) or ((start[0] == end[0]) and (start[1] > end[1])):
