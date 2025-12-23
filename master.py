@@ -176,10 +176,11 @@ class Master:
             (False, insert_slice, "bring down"),
         )
         common_programing_actions = (
-            ("assign", lambda: actions.user.code_operator("ASSIGNMENT")),
-            ("slap", lambda: actions.edit.line_insert_down()),
-            ("comma space", lambda: actions.insert(", ")),
-            ("tail", lambda: actions.edit.line_end()),
+            ("assign", self.create_action_with_text_reset(lambda: actions.user.code_operator("ASSIGNMENT"))),
+            ("slap", self.create_action_with_text_reset(actions.edit.line_insert_down)),
+            ("comma space", self.create_action_with_text_reset(lambda: actions.insert(", "))),
+            ("tail", self.create_action_with_text_reset(actions.edit.line_end)),
+            ("UPPERCASE", lambda: uppercase_current_text(self.keyboard)),
         )
         special_row_length = len(swap_zones) + len(slice_menu_zones) + len(common_programing_actions)
         special_row_width = round(self.keyboard.get_width()/special_row_length)
@@ -209,17 +210,10 @@ class Master:
             self.zone_manager.add_zone(zone)
             center_x += special_row_width
 
-        def perform_action_with_text_reset(action):
-            action()
-            self.keyboard.set_current_text("")
-            
-        def create_action_with_text_reset(action):
-            return lambda: perform_action_with_text_reset(action)
-
         for name, action in common_programing_actions:
             zone = create_simple_zone(
                 name,
-                create_action_with_text_reset(action),
+                action,
                 (center_x, center_y),
                 special_row_dimensions
             )
@@ -235,6 +229,13 @@ class Master:
             rgba2hex(255,255,255,ZONES_TEXT_ALPHA),
             "#7aacddff",
         ))
+
+    def perform_action_with_text_reset(self, action):
+        action()
+        self.keyboard.set_current_text("")
+            
+    def create_action_with_text_reset(self, action):
+        return lambda: self.perform_action_with_text_reset(action)
 
     def handle_keypress(self, key):
         self.keyboard.handle_keypress(key)
@@ -267,8 +268,7 @@ class Master:
             if matching_snippet_names:
                 row_number += 1
                 def snippet_action(name: str):
-                    for _ in range(len(last_word)):
-                        actions.edit.delete()
+                    delete_text_behind_cursor(last_word)
                     self.keyboard.update_current_text("")
                     actions.user.insert_snippet_by_name(name)
                 def create_snippet_lambda(name):
@@ -738,6 +738,17 @@ def compute_active_priority_snippet_names() -> list[str]:
             pass
     relevant_snippet_names = sorted(relevant_snippet_names)
     return relevant_snippet_names
+
+def uppercase_current_text(keyboard: Keyboard):
+    current_text = keyboard.current_text
+    delete_text_behind_cursor(current_text)
+    replacement = current_text.upper()
+    keyboard.set_current_text(replacement)
+    actions.insert(replacement)
+
+def delete_text_behind_cursor(text: str):
+    for _ in text:
+        actions.edit.delete()
 
 mod = Module()
 
