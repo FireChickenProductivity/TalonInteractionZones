@@ -473,7 +473,7 @@ class Master:
 
     def show_recent_insert_column(self):
         self.zone_manager.remove_temporary_zones()
-        recent_inserts = actions.user.fire_chicken_interaction_zones_get_n_recent_inserts(20)
+        recent_inserts = actions.user.fire_chicken_interaction_zones_get_n_recent_inserts(15)
         def create_insert_lambda(text: str):
             return lambda: actions.insert(text)
         insert_actions = [create_insert_lambda(text) for text in recent_inserts]
