@@ -52,3 +52,13 @@ backspace
 tab
 on hover 1 1
 tab
+
+#7aacddff|(1040, 1000)
+slap back
+on hover 1 1
+action: user.fire_chicken_interaction_zones_slap_back
+
+#7aacddff|(1140, 1000)
+slap twice back
+on hover 1 1
+action: user.fire_chicken_interaction_zones_slap_twice_back
