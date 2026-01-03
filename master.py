@@ -391,7 +391,7 @@ class Master:
         height = self.zonesRect.height
         width = self.zonesRect.width
         y = top
-        delta_y = math.floor(height/len(options))
+        delta_y = math.floor(height/(len(options) + 1))
         zone_height = round(delta_y*.8)
         def create_lambda(line_number, i):
             return lambda : self.slice_menu.handle_input(line_number, i)
@@ -414,6 +414,13 @@ class Master:
                 self.zone_manager.add_zone(zone)
                 x += delta_x
             y += delta_y
+        return_zone = create_simple_zone(
+            "exit",
+            self.return_to_previous_zone,
+            (left + (width)//2, y + (zone_height)//2),
+            (zone_height, round(width))
+        )
+        self.zone_manager.add_zone(return_zone)
 
     def show_file(self):
         optimal_name = self.get_optimal_file_name()
