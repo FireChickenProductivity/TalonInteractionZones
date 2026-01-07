@@ -401,7 +401,7 @@ class Master:
                 continue
             x = left
             delta_x = math.floor(width/(len(line)))
-            zone_width = round(delta_x*.8)
+            zone_width = round(delta_x*.5)
             for i, c in enumerate(line):
                 if c.isspace():
                     c = ""
