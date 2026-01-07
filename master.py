@@ -669,9 +669,15 @@ def primative_interaction(action:Union[Callable, str]):
             actions.user.keybinder_add_key_bind(action[6:].replace('\n',''))
             pass
         elif action.startswith("action: "):
-            action_name = action[8:]
+            action_information = action[8:]
+            components = action_information.split()
+            action_name = components[0]
             action_function = getattr(actions, action_name)
-            action_function()
+            if len(action_information) > 1:
+                arguments = parse_arguments_from_text(components[1:])
+                action_function(*arguments)
+            else:
+                action_function()
         elif action[:7]=="unbind:":
             actions.user.keybinder_remove_key_bind(action[8:].replace('\n',''))
         elif action[:5]=="swap:":
@@ -757,6 +763,24 @@ def delete_text_behind_cursor(text: str):
     for _ in text:
         actions.edit.delete()
 
+def parse_arguments_from_text(components: list[str]) -> list:
+    result = []
+    for component in components:
+        if component.isdigit():
+            result.append(int(component))
+        elif component.isnumeric():
+            result.append(float(component))
+        elif component.startswith('"') and component.endswith('"'):
+            result.append(component[1:-1])
+        elif component == "True":
+            result.append(True)
+        elif component == "False":
+            result.append(False)
+        else:
+            raise ValueError(f"Could not parse argument {component}")
+    return components
+            
+
 mod = Module()
 
 mod.setting(
@@ -770,3 +794,11 @@ class Actions:
     def fire_chicken_interaction_zones_handle_insert():
         """Have interaction zone user interface handle insert action"""
         master.handle_insert()
+
+    def fire_chicken_interaction_zones_bring_up():
+        """Shows the fire chicken interaction zones text bring from above interface"""
+        master.show_select_up_slice_menu(insert_slice)
+
+    def fire_chicken_interaction_zones_bring_down():
+        """Shows the fire chicken interaction zones text bring from below interface"""
+        master.show_select_down_slice_menu(insert_slice)

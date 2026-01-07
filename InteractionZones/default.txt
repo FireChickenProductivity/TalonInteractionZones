@@ -62,3 +62,13 @@ action: user.fire_chicken_interaction_zones_slap_back
 slap twice back
 on hover 1 1
 action: user.fire_chicken_interaction_zones_slap_twice_back
+
+#7aacddff|(1240, 1000)
+bring up
+on hover 1 1
+action: user.fire_chicken_interaction_zones_bring_up
+
+#7aacddff|(1340, 1000)
+bring down
+on hover 1 1
+action: user.fire_chicken_interaction_zones_bring_down
