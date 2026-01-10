@@ -6,7 +6,7 @@ from typing import Union, Callable
 from .helpers import rgba2hex, verify_home_dir, TRANSPARENT, TriggerType
 from .config_parser import parse_zone,is_line_newzone,is_line_endzone
 from .settings import *
-from .zones import SimpleZone, create_simple_zone
+from .zones import SimpleZone, create_simple_zone, TEXT_SIZE
 from .keyboard import Keyboard, Key
 from .text_area import TextArea, draw_text_area
 from .zone_management import ZoneManager
@@ -396,15 +396,13 @@ class Master:
         def create_lambda(line_number, i):
             return lambda : self.slice_menu.handle_input(line_number, i)
         for line_number, line in enumerate(options):
-            # display line
             if (len(line) == 0) or ((len(line) == 1) and (line[0].isspace())):
                 continue
             x = left
-            delta_x = math.floor(width/(len(line)))
-            zone_width = round(delta_x*.5)
             for i, c in enumerate(line):
+                zone_width = TEXT_SIZE*(len(c) + 1)
                 if c.isspace():
-                    c = ""
+                    zone_width = round(zone_width/2)
                 zone = create_simple_zone(
                     c,
                     create_lambda(line_number, i),
@@ -412,7 +410,7 @@ class Master:
                     (zone_height, zone_width)
                 )
                 self.zone_manager.add_zone(zone)
-                x += delta_x
+                x += zone_width + TEXT_SIZE
             y += delta_y
         return_zone = create_simple_zone(
             "exit",

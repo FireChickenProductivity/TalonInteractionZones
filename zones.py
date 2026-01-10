@@ -3,6 +3,8 @@ import time
 from .helpers import rgba2hex,TriggerType
 from .settings import *
 
+TEXT_SIZE = 10
+
 class Zone:
     def __init__(self,color,centre,name,ttype,action,warmup,repeatTime,modifiers, height= 80, width= 80) -> None:
         self.id = -1
@@ -76,7 +78,7 @@ class Zone:
         
         paint = canvas.paint
         paint.text_align = canvas.paint.TextAlign.LEFT
-        paint.textsize = 10
+        paint.textsize = TEXT_SIZE
         paint.style = Paint.Style.FILL
         text = self.name
         tr = paint.measure_text(text)[1]
