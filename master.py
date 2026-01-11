@@ -10,7 +10,7 @@ from .zones import SimpleZone, create_simple_zone, TEXT_SIZE
 from .keyboard import Keyboard, Key
 from .text_area import TextArea, draw_text_area
 from .zone_management import ZoneManager
-from .slice_menu import SliceMenu, insert_slice, compute_slice_menu_tokens, select_above_slice, select_below_slice
+from .slice_menu import SliceMenu, insert_slice, compute_slice_menu_tokens, select_above_slice, select_below_slice, change_slice_up, change_slice_down
 from .string_utilities import compute_last_word, compute_words
 
 HOME_DIRECTORY = verify_home_dir()
@@ -440,6 +440,8 @@ class Master:
             ("bring down", insert_slice, False),
             ("take up", select_above_slice, True),
             ("take down", select_below_slice, False),
+            ("chuck up", change_slice_up, True),
+            ("chuck down", change_slice_down, False)
         )
 
         def create_lambda(action, is_up: bool):

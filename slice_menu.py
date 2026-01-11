@@ -75,6 +75,14 @@ def select_below_slice(options, start, end):
 	for _ in range(bottom_right_index):
 		actions.edit.extend_left()
 
+def change_slice_up(options, start, end):
+	select_above_slice(options, start, end)
+	actions.edit.delete()
+
+def change_slice_down(options, start, end):
+	select_below_slice(options, start, end)
+	actions.edit.delete()
+
 def compute_total_length(strings: list[str]) -> int:
 	total = 0
 	for s in strings:
