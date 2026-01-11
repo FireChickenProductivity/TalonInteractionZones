@@ -31,6 +31,33 @@ def insert_slice(options, start, end):
 	text = compute_text(options, start, end)
 	actions.user.fire_chicken_interaction_zones_paste(text)
 
+def select_above_slice(options, start, end):
+	first_line, first_index = start
+	second_line, second_index = end
+	first_token_start_index = compute_total_length(options[first_line][:first_index])
+	second_token_end_index = compute_total_length(options[second_line][:second_index+1])
+	lines_up = len(options) - second_line - 1
+	for _ in range(lines_up):
+		actions.edit.up()
+	actions.edit.extend_line_start()
+	actions.edit.extend_line_start()
+	actions.edit.left()
+	for _ in range(second_token_end_index):
+		actions.edit.right()
+	lines_up_to_first_line = second_line - first_line
+	for _ in range(lines_up_to_first_line):
+		actions.edit.extend_line_up()
+	actions.edit.extend_line_start()
+	actions.edit.extend_line_start()
+	for _ in range(first_token_start_index):
+		actions.edit.extend_right()
+
+def compute_total_length(strings: list[str]) -> int:
+	total = 0
+	for s in strings:
+		total += len(s)
+	return total
+
 def compute_text(options, start, end) -> str:
 	first_line = start[0]
 	second_line = end[0]

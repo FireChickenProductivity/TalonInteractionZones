@@ -10,7 +10,7 @@ from .zones import SimpleZone, create_simple_zone, TEXT_SIZE
 from .keyboard import Keyboard, Key
 from .text_area import TextArea, draw_text_area
 from .zone_management import ZoneManager
-from .slice_menu import SliceMenu, insert_slice, compute_slice_menu_tokens
+from .slice_menu import SliceMenu, insert_slice, compute_slice_menu_tokens, select_above_slice
 from .string_utilities import compute_last_word, compute_words
 
 HOME_DIRECTORY = verify_home_dir()
@@ -174,6 +174,7 @@ class Master:
         slice_menu_zones = (
             (True, insert_slice, "bring up"),
             (False, insert_slice, "bring down"),
+            (True, select_above_slice, "select up"),
         )
         common_programing_actions = (
             ("assign", self.create_action_with_text_reset(lambda: actions.user.code_operator("ASSIGNMENT"))),
