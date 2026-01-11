@@ -52,6 +52,29 @@ def select_above_slice(options, start, end):
 	for _ in range(first_token_start_index):
 		actions.edit.extend_right()
 
+def select_below_slice(options, start, end):
+	print(start, end)
+	top_line, top_index = start
+	bottom_line, bottom_index = end
+	lines_down = top_line
+	for _ in range(lines_down):
+		actions.edit.down()
+	actions.edit.line_start()
+	actions.edit.line_start()
+	top_start_index = compute_total_length(options[top_line][:top_index])
+	for _ in range(top_start_index):
+		actions.edit.right()
+	actions.edit.extend_line_end()
+	lines_down_to_bottom_line = bottom_line - top_line
+	for _ in range(lines_down_to_bottom_line):
+		actions.edit.extend_line_down()
+	actions.edit.extend_line_end()
+	bottom_line_length = compute_total_length(options[bottom_line])
+	bottom_end_index = compute_total_length(options[bottom_line][:bottom_index+1])
+	bottom_right_index = bottom_line_length - bottom_end_index
+	for _ in range(bottom_right_index):
+		actions.edit.extend_left()
+
 def compute_total_length(strings: list[str]) -> int:
 	total = 0
 	for s in strings:
