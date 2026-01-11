@@ -197,11 +197,15 @@ class Master:
             )
             self.zone_manager.add_zone(zone)
             center_x += special_row_width
-        for is_up, target, name in slice_menu_zones:
+        
+        def create_slice_lambda(action, is_up: bool):
             if is_up:
-                action = lambda: self.show_select_up_slice_menu(target)
+                return lambda: self.show_select_up_slice_menu(action)
             else:
-                action = lambda: self.show_select_down_slice_menu(target)
+                return lambda: self.show_select_down_slice_menu(action)
+            
+        for is_up, target, name in slice_menu_zones:
+            action = create_slice_lambda(target, is_up)
             zone = create_simple_zone(
                 name,
                 action,
@@ -369,6 +373,7 @@ class Master:
         self.showZones = True
 
     def show_select_up_slice_menu(self, action):
+        print('action', action)
         option_text = actions.user.fire_chicken_interaction_zones_copy_up(SLICE_MENU_SELECTION_AMOUNT)
         options = option_text.split("\n")
         self.update_slice_menu(options, action)
