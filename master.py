@@ -26,7 +26,8 @@ RECENT_KEYSTROKES_ZONE_NAME = "RECENT_KEYSTROKE"
 KEYBOARD_ZONE_NAME = "KEYBOARD"
 EDIT_ACTIONS_ZONE_NAME = "EDIT"
 SLICE_MENU_ZONE_NAME = "SLICE_MENU"
-SPECIAL_ZONE_NAMES = set([SNIPPET_ZONE_NAME, OPERATOR_ZONE_NAME, RECENT_INSERTS_ZONE_NAME, RECENT_KEYSTROKES_ZONE_NAME, KEYBOARD_ZONE_NAME, EDIT_ACTIONS_ZONE_NAME, SLICE_MENU_ZONE_NAME])
+SLICE_COMMANDS_ZONE_NAME = "SLICE_COMMANDS"
+SPECIAL_ZONE_NAMES = set([SNIPPET_ZONE_NAME, OPERATOR_ZONE_NAME, RECENT_INSERTS_ZONE_NAME, RECENT_KEYSTROKES_ZONE_NAME, KEYBOARD_ZONE_NAME, EDIT_ACTIONS_ZONE_NAME, SLICE_MENU_ZONE_NAME, SLICE_COMMANDS_ZONE_NAME])
 
 class Master:
     __slots__ = (
@@ -143,6 +144,8 @@ class Master:
             self.show_keyboard()
         elif name == SLICE_MENU_ZONE_NAME:
             self.show_slice_menu()
+        elif name == SLICE_COMMANDS_ZONE_NAME:
+            self.show_slice_commands()
 
     def show_keyboard(self):
         def create_key_operator(key: Key):
@@ -170,12 +173,11 @@ class Master:
             ("default", "default"),
             ("operator", ":OPERATOR"),
             ("edit", ":EDIT"),
+            ("slice", ":SLICE_COMMANDS"),
         )
         slice_menu_zones = (
             (True, insert_slice, "bring up"),
             (False, insert_slice, "bring down"),
-            (True, select_above_slice, "select up"),
-            (False, select_below_slice, "select down"),
         )
         common_programing_actions = (
             ("assign", self.create_action_with_text_reset(lambda: actions.user.code_operator("ASSIGNMENT"))),
@@ -373,21 +375,24 @@ class Master:
         self.zone_manager.add_zone(keyboard_zone)
         self.showZones = True
 
-    def show_select_up_slice_menu(self, action):
-        print('action', action)
+    def show_select_up_slice_menu(self, action, return_zone: str | None=None):
         option_text = actions.user.fire_chicken_interaction_zones_copy_up(SLICE_MENU_SELECTION_AMOUNT)
         options = option_text.split("\n")
-        self.update_slice_menu(options, action)
+        self.update_slice_menu(options, action, return_zone)
 
-    def show_select_down_slice_menu(self, action):
+    def show_select_down_slice_menu(self, action, return_zone: str | None=None):
         option_text = actions.user.fire_chicken_interaction_zones_copy_down(SLICE_MENU_SELECTION_AMOUNT)
         options = option_text.split("\n")
-        self.update_slice_menu(options, action)
+        self.update_slice_menu(options, action, return_zone)
 
-    def update_slice_menu(self, options: list[str], action):
+    def update_slice_menu(self, options: list[str], action, return_zone: str | None=None):
+        if return_zone:
+            return_action = lambda: self.set_zone_override(return_zone)
+        else:
+            return_action = self.return_to_previous_zone
         tokens = [compute_slice_menu_tokens(option) for 
                   option in options]
-        self.slice_menu = SliceMenu(tokens, action, self.return_to_previous_zone)
+        self.slice_menu = SliceMenu(tokens, action, return_action)
         self.set_zone_override(SPECIAL_SWAP_NAME_PREFIX + SLICE_MENU_ZONE_NAME)
 
     def show_slice_menu(self):
@@ -426,6 +431,29 @@ class Master:
             (zone_height, round(width))
         )
         self.zone_manager.add_zone(return_zone)
+
+    def show_slice_commands(self):
+        self.showZones = True
+        previous_zone = self.previous_zone
+        commands = (
+            ("bring up", insert_slice, True),
+            ("bring down", insert_slice, False),
+            ("take up", select_above_slice, True),
+            ("take down", select_below_slice, False),
+        )
+
+        def create_lambda(action, is_up: bool):
+            if is_up:
+                return lambda: self.show_select_up_slice_menu(action, previous_zone)
+            else:
+                return lambda: self.show_select_down_slice_menu(action, previous_zone)
+        
+        names = []
+        actions_list = []
+        for name, target, is_up in commands:
+            names.append(name)
+            actions_list.append(create_lambda(target, is_up))
+        self.show_zone_for_list(names, actions_list)
 
     def show_file(self):
         optimal_name = self.get_optimal_file_name()
