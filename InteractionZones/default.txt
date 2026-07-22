@@ -72,3 +72,8 @@ action: user.fire_chicken_interaction_zones_bring_up
 bring down
 on hover 1 1
 action: user.fire_chicken_interaction_zones_bring_down
+
+#7aacddff|(1440, 1000)
+clickless mouse
+on hover 1 1
+action: user.clickless_mouse_toggle
