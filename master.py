@@ -2,6 +2,7 @@ from talon import ui, canvas, cron, ctrl, actions, Module, settings
 from talon.skia import Rect
 import os
 import math
+from enum import Enum, auto
 from typing import Union, Callable
 from .helpers import rgba2hex, verify_home_dir, TRANSPARENT, TriggerType
 from .config_parser import parse_zone,is_line_newzone,is_line_endzone
@@ -29,12 +30,16 @@ SLICE_MENU_ZONE_NAME = "SLICE_MENU"
 SLICE_COMMANDS_ZONE_NAME = "SLICE_COMMANDS"
 SPECIAL_ZONE_NAMES = set([SNIPPET_ZONE_NAME, OPERATOR_ZONE_NAME, RECENT_INSERTS_ZONE_NAME, RECENT_KEYSTROKES_ZONE_NAME, KEYBOARD_ZONE_NAME, EDIT_ACTIONS_ZONE_NAME, SLICE_MENU_ZONE_NAME, SLICE_COMMANDS_ZONE_NAME])
 
+class KeyboardConfiguration(Enum):
+    coding = auto()
+    prose = auto()
+
 class Master:
     __slots__ = (
         'displays', 'showZones', 'screen', 'screenRect', 'zonesRect', 'canvas', 'configs',
         'activeID', 'toggleRect', 'lastWindowTitle', 'activeZoneSet', 'overrideZoneSet', 'updateTriggered',
         'keyboard', 'job', 'job2', 'zone_manager', 'previous_zone',
-        'slice_menu', 'num_keyboard_interactions')
+        'slice_menu', 'num_keyboard_interactions', 'keyboard_configuration')
     def __init__(self) -> None:
         self.displays = {}
         self.showZones = False
@@ -66,6 +71,7 @@ class Master:
         self.keyboard.update_size(self.screen.width, self.screen.height//2)
         self.num_keyboard_interactions = 0
         self.slice_menu = None
+        self.keyboard_configuration: KeyboardConfiguration = KeyboardConfiguration.coding
 
     def set_zone_override(self,zoneSet):
         self.previous_zone = self.overrideZoneSet
@@ -169,24 +175,19 @@ class Master:
                 x += key_width
             y += key_height
             x = self.keyboard.x
-        swap_zones = (
+        swap_zones = [
             ("default", "default"),
-            ("operator", ":OPERATOR"),
             ("edit", ":EDIT"),
             ("slice", ":SLICE_COMMANDS"),
-        )
+        ]
+        if self.keyboard_configuration == KeyboardConfiguration.coding:
+            swap_zones.append(("operator", ":OPERATOR"))
         slice_menu_zones = (
             (True, insert_slice, "bring up"),
             (False, insert_slice, "bring down"),
         )
-        common_programing_actions = (
-            ("assign", self.create_action_with_text_reset(lambda: actions.user.code_operator("ASSIGNMENT"))),
-            ("slap", self.create_action_with_text_reset(actions.edit.line_insert_down)),
-            ("comma space", self.create_action_with_text_reset(lambda: actions.insert(", "))),
-            ("tail", self.create_action_with_text_reset(actions.edit.line_end)),
-            ("UPPERCASE", lambda: uppercase_current_text(self.keyboard)),
-        )
-        special_row_length = len(swap_zones) + len(slice_menu_zones) + len(common_programing_actions)
+        common_actions = self.create_common_actions()
+        special_row_length = len(swap_zones) + len(slice_menu_zones) + len(common_actions)
         special_row_width = round(self.keyboard.get_width()/special_row_length)
         special_row_dimensions = (key_height, round(special_row_width*scaling_factor))
         center_x = x + special_row_width // 2
@@ -218,7 +219,7 @@ class Master:
             self.zone_manager.add_zone(zone)
             center_x += special_row_width
 
-        for name, action in common_programing_actions:
+        for name, action in common_actions:
             zone = create_simple_zone(
                 name,
                 action,
@@ -237,6 +238,24 @@ class Master:
             rgba2hex(255,255,255,ZONES_TEXT_ALPHA),
             "#7aacddff",
         ))
+
+    def create_common_actions(self):
+        comma_space = ("comma space", self.create_action_with_text_reset(lambda: actions.insert(", ")))
+        if self.keyboard_configuration == KeyboardConfiguration.coding:
+            return (
+                ("assign", self.create_action_with_text_reset(lambda: actions.user.code_operator("ASSIGNMENT"))),
+                ("slap", self.create_action_with_text_reset(actions.edit.line_insert_down)),
+                comma_space,
+                ("tail", self.create_action_with_text_reset(actions.edit.line_end)),
+                ("UPPERCASE", lambda: uppercase_current_text(self.keyboard)),
+            )
+        elif self.keyboard_configuration == KeyboardConfiguration.prose:
+            return (
+                comma_space,
+                ("point space", self.create_action_with_text_reset(lambda: actions.insert(". "))),
+                ("? space", self.create_action_with_text_reset(lambda: actions.insert("? "))),
+            )
+        return []
 
     def perform_action_with_text_reset(self, action):
         action()
