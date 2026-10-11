@@ -310,7 +310,7 @@ class Master:
                 if name.startswith(last_word)
             ]
             
-            if matching_snippet_names:
+            if matching_snippet_names and self.keyboard_configuration == KeyboardConfiguration.coding:
                 row_number += 1
                 def snippet_action(name: str):
                     delete_text_behind_cursor(last_word)
