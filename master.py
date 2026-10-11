@@ -273,7 +273,7 @@ class Master:
                 ("point space", self.create_action_with_text_reset(lambda: actions.insert(". "))),
                 ("? space", self.create_action_with_text_reset(lambda: actions.insert("? "))),
             ]
-            for sequence in ("ing", "tion", "ed"):
+            for sequence in sorted(["ing", "tion", "ed", "ch", "in", "er", "or", "ar", "th", "he", "en", "nt", "re", "an", "ti", "es", "on", "at", "se", "nd", "al", "te", "co", "de", "to", "ra", "et", "it", "sa", "em", "ro"]):
                 result.append((sequence, self.create_insert_with_keyboard_action(sequence)))
             return result
         return []
