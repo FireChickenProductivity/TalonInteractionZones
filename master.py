@@ -28,7 +28,8 @@ KEYBOARD_ZONE_NAME = "KEYBOARD"
 EDIT_ACTIONS_ZONE_NAME = "EDIT"
 SLICE_MENU_ZONE_NAME = "SLICE_MENU"
 SLICE_COMMANDS_ZONE_NAME = "SLICE_COMMANDS"
-SPECIAL_ZONE_NAMES = set([SNIPPET_ZONE_NAME, OPERATOR_ZONE_NAME, RECENT_INSERTS_ZONE_NAME, RECENT_KEYSTROKES_ZONE_NAME, KEYBOARD_ZONE_NAME, EDIT_ACTIONS_ZONE_NAME, SLICE_MENU_ZONE_NAME, SLICE_COMMANDS_ZONE_NAME])
+KEYBOARD_MODE_ZONE_NAME = "KEYBOARD_MODE"
+SPECIAL_ZONE_NAMES = set([SNIPPET_ZONE_NAME, OPERATOR_ZONE_NAME, RECENT_INSERTS_ZONE_NAME, RECENT_KEYSTROKES_ZONE_NAME, KEYBOARD_ZONE_NAME, EDIT_ACTIONS_ZONE_NAME, SLICE_MENU_ZONE_NAME, SLICE_COMMANDS_ZONE_NAME, KEYBOARD_MODE_ZONE_NAME])
 
 class KeyboardConfiguration(Enum):
     coding = auto()
@@ -146,12 +147,28 @@ class Master:
             names = [a[0] for a in edit_actions]
             corresponding_actions = [a[1] for a in edit_actions]
             self.show_zone_for_list(names, corresponding_actions)
+        elif name == KEYBOARD_MODE_ZONE_NAME:
+            names = []
+            corresponding_actions = []
+            for configuration in KeyboardConfiguration:
+                names.append(configuration.name)
+                corresponding_actions.append(self.create_update_keyboard_configuration_function(configuration))
+            self.show_zone_for_list(names, corresponding_actions)
         elif name == KEYBOARD_ZONE_NAME:
             self.show_keyboard()
         elif name == SLICE_MENU_ZONE_NAME:
             self.show_slice_menu()
         elif name == SLICE_COMMANDS_ZONE_NAME:
             self.show_slice_commands()
+
+    def create_update_keyboard_configuration_function(self, configuration: KeyboardConfiguration):
+        def function():
+            self._update_keyboard_configuration(configuration)
+            self.return_to_previous_zone()
+        return function
+
+    def _update_keyboard_configuration(self, configuration: KeyboardConfiguration):
+        self.keyboard_configuration = configuration
 
     def show_keyboard(self):
         def create_key_operator(key: Key):
@@ -179,6 +196,7 @@ class Master:
             ("default", "default"),
             ("edit", ":EDIT"),
             ("slice", ":SLICE_COMMANDS"),
+            ("cfg", f":{KEYBOARD_MODE_ZONE_NAME}")
         ]
         if self.keyboard_configuration == KeyboardConfiguration.coding:
             swap_zones.append(("operator", ":OPERATOR"))
