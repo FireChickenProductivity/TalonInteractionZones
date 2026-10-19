@@ -229,4 +229,4 @@ def create_simple_zone(
     center,
     dimensions
     ):
-    return SimpleZone(color="#7aacddff", name=name, ttype=TriggerType.HOVER, action=action, warmup=1, repeatTime=1, modifiers="", centre=center, dimensions=dimensions)
+    return SimpleZone(color="#7aacddff", name=name, ttype=TriggerType.HOVER, action=action, warmup=0.25, repeatTime=1, modifiers="", centre=center, dimensions=dimensions)
