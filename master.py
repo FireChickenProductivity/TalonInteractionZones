@@ -188,7 +188,7 @@ class Master:
                 key_text = f"{key.main_key} / {key.secondary_key}" if key.secondary_key else key.main_key
                 center_x = x + key_width // 2
                 center_y = self.y + key_height // 2
-                zone = SimpleZone(color="#7aacddff", name=key_text, ttype=TriggerType.HOVER, action=create_key_operator(key), warmup=1, repeatTime=1, modifiers="", centre=(center_x, center_y), dimensions=(adjusted_height, adjusted_width))
+                zone = SimpleZone(color="#7aacddff", name=key_text, ttype=TriggerType.HOVER, action=create_key_operator(key), warmup=0.5, repeatTime=1, modifiers="", centre=(center_x, center_y), dimensions=(adjusted_height, adjusted_width))
                 
                 self.zone_manager.add_zone(zone)
                 x += key_width
