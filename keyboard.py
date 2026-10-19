@@ -84,6 +84,11 @@ class Keyboard:
 			self.current_text = ""
 		self.current_text_callback(self.current_text, previous)
 
+	def hold_shift(self):
+		"""Make the shift key held"""
+		if "shift" not in self._held_modifiers:
+			self._held_modifiers.add("shift")
+
 	def set_current_text(self, text):
 		"""Update current text and call callback"""
 		previous = self.current_text

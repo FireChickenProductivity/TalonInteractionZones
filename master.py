@@ -273,10 +273,14 @@ class Master:
                 ("UPPERCASE", lambda: uppercase_current_text(self.keyboard)),
             )
         elif self.keyboard_configuration == KeyboardConfiguration.prose:
+            def create_insert_space_action(text):
+                actions.insert(text)
+                self.keyboard.set_current_text("")
+                self.keyboard.hold_shift()
             result = [
                 comma_space,
-                ("point space", self.create_action_with_text_reset(lambda: actions.insert(". "))),
-                ("? space", self.create_action_with_text_reset(lambda: actions.insert("? "))),
+                ("point space", lambda : create_insert_space_action(". ")),
+                ("? space", lambda : create_insert_space_action("? ")),
             ]
             return result
         return []
