@@ -40,7 +40,7 @@ class Master:
         'displays', 'showZones', 'screen', 'screenRect', 'zonesRect', 'canvas', 'configs',
         'activeID', 'toggleRect', 'lastWindowTitle', 'activeZoneSet', 'overrideZoneSet', 'updateTriggered',
         'keyboard', 'job', 'job2', 'zone_manager', 'previous_zone',
-        'slice_menu', 'num_keyboard_interactions', 'keyboard_configuration')
+        'slice_menu', 'num_keyboard_interactions', 'keyboard_configuration', 'y')
     def __init__(self) -> None:
         self.displays = {}
         self.showZones = False
@@ -73,6 +73,7 @@ class Master:
         self.num_keyboard_interactions = 0
         self.slice_menu = None
         self.keyboard_configuration: KeyboardConfiguration = KeyboardConfiguration.coding
+        self.y = None
 
     def set_zone_override(self,zoneSet):
         self.previous_zone = self.overrideZoneSet
@@ -97,6 +98,7 @@ class Master:
             
     def show(self):
         self.showZones = False
+        self.y = None
         self.activeZoneSet=""
         self.zone_manager.clear()
         if is_special_zone(self.overrideZoneSet):
@@ -175,7 +177,7 @@ class Master:
             return lambda: self.handle_keypress(key)
                 
         x = self.keyboard.x
-        y = self.keyboard.y
+        self.y = self.keyboard.y
         key_height = self.keyboard.compute_key_height()
         scaling_factor = 0.50
         adjusted_height = round(key_height * scaling_factor)
@@ -185,12 +187,12 @@ class Master:
             for key in self.keyboard.rows[row_index]:
                 key_text = f"{key.main_key} / {key.secondary_key}" if key.secondary_key else key.main_key
                 center_x = x + key_width // 2
-                center_y = y + key_height // 2
+                center_y = self.y + key_height // 2
                 zone = SimpleZone(color="#7aacddff", name=key_text, ttype=TriggerType.HOVER, action=create_key_operator(key), warmup=1, repeatTime=1, modifiers="", centre=(center_x, center_y), dimensions=(adjusted_height, adjusted_width))
                 
                 self.zone_manager.add_zone(zone)
                 x += key_width
-            y += key_height
+            self.y += key_height
             x = self.keyboard.x
         swap_zones = [
             ("default", "default"),
@@ -209,7 +211,7 @@ class Master:
         special_row_width = round(self.keyboard.get_width()/special_row_length)
         special_row_dimensions = (key_height, round(special_row_width*scaling_factor))
         center_x = x + special_row_width // 2
-        center_y = y + key_height // 2
+        center_y = self.y + key_height // 2
         for name, target in swap_zones:
             zone = create_simple_zone(
                 "swap " + name,
@@ -246,6 +248,9 @@ class Master:
             )
             self.zone_manager.add_zone(zone)
             center_x += special_row_width
+        if self.keyboard_configuration == KeyboardConfiguration.prose:
+            self.y += key_height
+            self.add_common_sequences_row(key_height)
         self.showZones = True
         self.zone_manager.add_text_area(TextArea(
             "",
@@ -273,10 +278,27 @@ class Master:
                 ("point space", self.create_action_with_text_reset(lambda: actions.insert(". "))),
                 ("? space", self.create_action_with_text_reset(lambda: actions.insert("? "))),
             ]
-            for sequence in sorted(["ing", "tion", "ed", "ch", "in", "er", "or", "ar", "th", "he", "en", "nt", "re", "an", "ti", "es", "on", "at", "se", "nd", "al", "te", "co", "de", "to", "ra", "et", "it", "sa", "em", "ro"]):
-                result.append((sequence, self.create_insert_with_keyboard_action(sequence)))
             return result
         return []
+
+    def add_common_sequences_row(self, height):
+        sequences = sorted(["ing", "tion", "ed", "ch", "in", "er", "or", "ar", "th", "he", "en", "nt", "re", "an", "ti", "es", "on", "at", "se", "nd", "al", "te", "co", "de", "to", "ra", "et", "it", "sa", "em", "ro"])
+        sequence_actions = [self.create_insert_with_keyboard_action(sequence) for sequence in sequences]
+        self.show_row(sequences, sequence_actions, height)
+
+    def show_row(self, names, actions, zone_height):
+        width = self.zonesRect.width
+        zone_width = math.floor(width/len(names))
+        zone_dimensions = (math.floor(0.65*zone_height), math.floor(0.65*zone_width))
+        self.y += zone_height
+        left = self.zonesRect.left
+        zone_number = 0
+        for n, action in zip(names, actions):
+            x = left + (zone_number + 1)*zone_width - 0.5*zone_width
+            zone = SimpleZone(color="#7aacddff", name=n, ttype=TriggerType.HOVER, action=action, warmup=1, repeatTime=1, modifiers="", centre=(x, self.y - zone_height//2), dimensions=zone_dimensions)
+            self.zone_manager.add_zone(zone)
+            zone_number += 1
+
 
     def create_insert_with_keyboard_action(self, text: str):
         return lambda : self.insert_with_keyboard(text)
@@ -312,8 +334,8 @@ class Master:
                     actions.user.interaction_zones_handle_word_used_by_user(word)
         self.zone_manager.update_text_area_text(0, text)
         self.zone_manager.remove_temporary_zones()
-        row_number: int = 0
         last_word = compute_last_word(text)
+        row_number = 1
         if last_word:
             snippet_names = compute_active_snippet_names()
             matching_snippet_names = [
@@ -322,7 +344,6 @@ class Master:
             ]
             
             if matching_snippet_names and self.keyboard_configuration == KeyboardConfiguration.coding:
-                row_number += 1
                 def snippet_action(name: str):
                     delete_text_behind_cursor(last_word)
                     self.keyboard.update_current_text("")
@@ -331,6 +352,7 @@ class Master:
                     return lambda: snippet_action(name)
                 corresponding_actions = [create_snippet_lambda(name) for name in matching_snippet_names]
                 self.add_temporary_keyboard_row(matching_snippet_names, corresponding_actions, row_number)
+                row_number += 1
             word_completions = actions.user.interaction_zones_get_completions(last_word.lower(), 20)
             def completion_action(completion):
                 extra = completion[len(last_word):]
@@ -339,18 +361,18 @@ class Master:
             def create_completion_lambda(completion):
                 return lambda: completion_action(completion)
             if word_completions:
-                row_number += 1
                 corresponding_actions = [create_completion_lambda(c) for c in word_completions]
                 self.add_temporary_keyboard_row(word_completions, corresponding_actions, row_number)
+                row_number += 1
             recent_inserts = actions.user.fire_chicken_interaction_zones_get_recent_inserts()
             matching_inserts = [t for t in recent_inserts
                             if t.startswith(last_word) and len(last_word) < len(t)]
             if matching_inserts:
-                row_number += 1
                 corresponding_actions = [create_completion_lambda(c) for c in matching_inserts]
                 self.add_temporary_keyboard_row(matching_inserts, corresponding_actions, row_number)
+                row_number += 1
                     
-    def add_temporary_keyboard_row(self, names, corresponding_actions, row_number: int):
+    def add_temporary_keyboard_row(self, names, corresponding_actions, row_number):
         """
             Add a row at the bottom of the keyboard with
             names as the display text and corresponding_actions
@@ -360,7 +382,7 @@ class Master:
         """
         x = self.keyboard.x
         height = self.keyboard.compute_key_height()
-        y = (len(self.keyboard.rows)+row_number)*height + self.keyboard.y
+        y = row_number*height + self.y
         width = round(self.keyboard.get_width()//len(names))
         for i in range(len(names)):
             name = names[i]
