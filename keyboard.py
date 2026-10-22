@@ -89,6 +89,10 @@ class Keyboard:
 		if "shift" not in self._held_modifiers:
 			self._held_modifiers.add("shift")
 
+	def discard_text(self):
+		"""Clear the text without using it"""
+		self.current_text = ""
+
 	def set_current_text(self, text):
 		"""Update current text and call callback"""
 		previous = self.current_text

@@ -277,10 +277,15 @@ class Master:
                 actions.insert(text)
                 self.keyboard.set_current_text("")
                 self.keyboard.hold_shift()
+            def space_reset():
+                self.cleanup_keyboard_text()
+                actions.key('space')
             result = [
                 comma_space,
                 ("point space", lambda : create_insert_space_action(". ")),
                 ("? space", lambda : create_insert_space_action("? ")),
+                ("I", lambda : actions.insert("I ")),
+                ("space re", space_reset),
             ]
             return result
         return []
@@ -375,6 +380,12 @@ class Master:
                 corresponding_actions = [create_completion_lambda(c) for c in matching_inserts]
                 self.add_temporary_keyboard_row(matching_inserts, corresponding_actions, row_number)
                 row_number += 1
+
+    def cleanup_keyboard_text(self):
+        """Reset the keyboard text without using it to update statistics"""
+        self.zone_manager.update_text_area_text(0, "")
+        self.zone_manager.remove_temporary_zones()
+        self.keyboard.discard_text()
                     
     def add_temporary_keyboard_row(self, names, corresponding_actions, row_number):
         """
