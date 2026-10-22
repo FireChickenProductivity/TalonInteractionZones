@@ -18,6 +18,11 @@ key
 on hover 1 1
 swap: :RECENT_KEYSTROKE
 
+#7aacddff|(400, 101)
+minimal
+on hover 2 2
+swap: minimal
+
 #7aacddff|(1244, 101)
 operators
 on hover 1 1
